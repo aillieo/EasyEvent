@@ -1,0 +1,236 @@
+namespace AillieoUtils.EasyEvents
+{
+    using System;
+
+    public class Event
+    {
+        private int lockCount;
+
+        private Handle head;
+
+        public int ListenerCount { get; private set; }
+
+        public Handle AddListener(Action callback)
+        {
+            Handle newHandle = new Handle(callback, this);
+
+            if (this.head == null)
+            {
+                this.head = newHandle;
+                this.head.next = this.head;
+                this.head.previous = this.head;
+            }
+            else
+            {
+                newHandle.next = this.head;
+                newHandle.previous = this.head.previous;
+                this.head.previous.next = newHandle;
+                this.head.previous = newHandle;
+            }
+
+            this.ListenerCount++;
+
+            return newHandle;
+        }
+
+        public bool Remove(Handle handle)
+        {
+            if (this.head == null)
+            {
+                return false;
+            }
+
+            if (handle == null)
+            {
+                return false;
+            }
+
+            if (handle.owner != this)
+            {
+                return false;
+            }
+
+            if (handle.callback == null)
+            {
+                return false;
+            }
+
+            handle.callback = null;
+
+            if (this.lockCount == 0)
+            {
+                // 需要考虑3种情况
+                if (handle.next == handle)
+                {
+                    // 1. handle是唯一handle
+                    this.head = null;
+                }
+                else if (this.head == handle)
+                {
+                    // 2. handle是head
+                    handle.next.previous = handle.previous;
+                    handle.previous.next = handle.next;
+                    this.head = handle.next;
+                }
+                else
+                {
+                    // 3. 其它情况
+                    handle.next.previous = handle.previous;
+                    handle.previous.next = handle.next;
+                }
+
+                handle.next = null;
+                handle.previous = null;
+            }
+
+            this.ListenerCount--;
+            return true;
+        }
+
+        public int RemoveListener(Action callback)
+        {
+            if (callback == null)
+            {
+                return 0;
+            }
+
+            Handle handle = this.head;
+            int oldListenerCount = ListenerCount;
+
+            if (handle != null)
+            {
+                while (true)
+                {
+                    if (handle.callback == callback)
+                    {
+                        handle.callback = null;
+                        ListenerCount--;
+                    }
+
+                    handle = handle.next;
+                    
+                    if (handle == null || handle == this.head)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            return oldListenerCount - ListenerCount;
+        }
+
+        public void RemoveAllListeners()
+        {
+            Handle handle = this.head;
+
+            while (true)
+            {
+                handle.callback = null;
+                handle = handle.next;
+                if (handle == null || handle == this.head)
+                {
+                    break;
+                }
+            }
+
+            this.ListenerCount = 0;
+        }
+
+        public void Invoke()
+        {
+            if (this.head == null)
+            {
+                return;
+            }
+
+            this.lockCount++;
+            Handle handle = this.head;
+            while (true)
+            {
+                if (handle.callback != null)
+                {
+                    try
+                    {
+                        handle.callback();
+                    }
+                    finally
+                    {
+                        handle = handle.next;
+                    }
+
+                    if (handle == null || handle == this.head)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    if (this.lockCount == 1)
+                    {
+                        // 需要考虑3种情况
+                        if (handle.next == handle)
+                        {
+                            // 1. handle是唯一handle
+                            this.head = null;
+                            break;
+                        }
+                        else if (this.head == handle)
+                        {
+                            // 2. handle是head
+                            handle.next.previous = handle.previous;
+                            handle.previous.next = handle.next;
+                            this.head = handle.next;
+                            handle.next = null;
+                            handle.previous = null;
+                            handle = this.head;
+                            continue;
+                        }
+                        else
+                        {
+                            // 3. 其它情况
+                            handle.next.previous = handle.previous;
+                            handle.previous.next = handle.next;
+                            Handle next = handle.next;
+                            handle.next = null;
+                            handle.previous = null;
+                            handle = next;
+                            if (handle == null || handle == this.head)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.lockCount--;
+        }
+    }
+
+    public class Handle
+    {
+        internal readonly Event owner;
+
+        internal Action callback;
+
+        internal Handle next;
+
+        internal Handle previous;
+
+        internal Handle(Action callback, Event owner)
+        {
+            this.callback = callback;
+            this.owner = owner;
+        }
+
+        public bool Unlisten()
+        {
+            if (this.callback != null)
+            {
+                return this.owner.Remove(this);
+            }
+
+            return false;
+        }
+    }
+}
