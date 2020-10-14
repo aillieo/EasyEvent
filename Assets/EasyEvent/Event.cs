@@ -1,6 +1,7 @@
-namespace AillieoUtils.EasyEvents
+namespace AillieoUtils
 {
     using System;
+    using System.Collections.Generic;
 
     public class Event
     {
@@ -143,6 +144,8 @@ namespace AillieoUtils.EasyEvents
                 return;
             }
 
+            List<Exception> exceptions = null;
+
             this.lockCount++;
             Handle handle = this.head;
             while (true)
@@ -152,6 +155,14 @@ namespace AillieoUtils.EasyEvents
                     try
                     {
                         handle.callback();
+                    }
+                    catch(Exception e)
+                    {
+                        if(exceptions == null)
+                        {
+                            exceptions = new List<Exception>();
+                        }
+                        exceptions.Add(e);
                     }
                     finally
                     {
@@ -204,6 +215,11 @@ namespace AillieoUtils.EasyEvents
             }
 
             this.lockCount--;
+
+            if(exceptions != null)
+            {
+                throw new AggregateException(exceptions);
+            }
         }
     }
 
