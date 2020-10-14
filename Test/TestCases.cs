@@ -1,8 +1,8 @@
 using System;
-using AillieoUtils.EasyEvents;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Event = AillieoUtils.EasyEvents.Event;
+using Handle = AillieoUtils.Handle;
+using Event = AillieoUtils.Event;
 
 public class TestCases : MonoBehaviour
 {
