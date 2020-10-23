@@ -3,17 +3,17 @@ namespace AillieoUtils
     using System;
     using System.Collections.Generic;
 
-    public class Event
+    public class Event<T>
     {
         private int lockCount;
 
-        private Handle head;
+        private Handle<T> head;
 
         public int ListenerCount { get; private set; }
 
-        public Handle AddListener(Action callback)
+        public Handle<T> AddListener(Action<T> callback)
         {
-            Handle newHandle = new Handle(callback, this);
+            Handle<T> newHandle = new Handle<T>(callback, this);
 
             if (this.head == null)
             {
@@ -34,7 +34,7 @@ namespace AillieoUtils
             return newHandle;
         }
 
-        public bool Remove(Handle handle)
+        public bool Remove(Handle<T> handle)
         {
             if (this.head == null)
             {
@@ -88,14 +88,14 @@ namespace AillieoUtils
             return true;
         }
 
-        public int RemoveListener(Action callback)
+        public int RemoveListener(Action<T> callback)
         {
             if (callback == null)
             {
                 return 0;
             }
 
-            Handle handle = this.head;
+            Handle<T> handle = this.head;
             int oldListenerCount = ListenerCount;
 
             if (handle != null)
@@ -122,7 +122,7 @@ namespace AillieoUtils
 
         public void RemoveAllListeners()
         {
-            Handle handle = this.head;
+            Handle<T> handle = this.head;
 
             while (true)
             {
@@ -137,7 +137,7 @@ namespace AillieoUtils
             this.ListenerCount = 0;
         }
 
-        public void Invoke()
+        public void Invoke(T arg)
         {
             if (this.head == null)
             {
@@ -147,14 +147,14 @@ namespace AillieoUtils
             List<Exception> exceptions = null;
 
             this.lockCount++;
-            Handle handle = this.head;
+            Handle<T> handle = this.head;
             while (true)
             {
                 if (handle.callback != null)
                 {
                     try
                     {
-                        handle.callback();
+                        handle.callback(arg);
                     }
                     catch(Exception e)
                     {
@@ -201,7 +201,7 @@ namespace AillieoUtils
                             // 3. 其它情况
                             handle.next.previous = handle.previous;
                             handle.previous.next = handle.next;
-                            Handle next = handle.next;
+                            Handle<T> next = handle.next;
                             handle.next = null;
                             handle.previous = null;
                             handle = next;
@@ -222,30 +222,30 @@ namespace AillieoUtils
             }
         }
 
-        public static Event operator + (Event evt, Action callback)
+        public static Event<T> operator + (Event<T> evt, Action<T> callback)
         {
             evt.AddListener(callback);
             return evt;
         }
 
-        public static Event operator - (Event evt, Action callback)
+        public static Event<T> operator - (Event<T> evt, Action<T> callback)
         {
             evt.RemoveListener(callback);
             return evt;
         }
     }
 
-    public class Handle
+    public class Handle<T>
     {
-        internal readonly Event owner;
+        internal readonly Event<T> owner;
 
-        internal Action callback;
+        internal Action<T> callback;
 
-        internal Handle next;
+        internal Handle<T> next;
 
-        internal Handle previous;
+        internal Handle<T> previous;
 
-        internal Handle(Action callback, Event owner)
+        internal Handle(Action<T> callback, Event<T> owner)
         {
             this.callback = callback;
             this.owner = owner;
