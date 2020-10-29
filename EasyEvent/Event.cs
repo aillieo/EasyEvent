@@ -34,6 +34,17 @@ namespace AillieoUtils
             return newHandle;
         }
 
+        public Handle ListenOnce(Action callback)
+        {
+            Handle handle = default;
+            handle = AddListener(() =>
+            {
+                Remove(handle);
+                callback?.Invoke();
+            });
+            return handle;
+        }
+        
         public bool Remove(Handle handle)
         {
             if (this.head == null)
@@ -139,6 +150,16 @@ namespace AillieoUtils
 
         public void Invoke()
         {
+            InternalInvoke(false);
+        }
+
+        public void SafeInvoke()
+        {
+            InternalInvoke(true);
+        }
+
+        private void InternalInvoke(bool continueOnException)
+        {
             if (this.head == null)
             {
                 return;
@@ -158,6 +179,12 @@ namespace AillieoUtils
                     }
                     catch(Exception e)
                     {
+                        if(!continueOnException)
+                        {
+                            this.lockCount--;
+                            throw;
+                        }
+
                         if(exceptions == null)
                         {
                             exceptions = new List<Exception>();
@@ -222,17 +249,23 @@ namespace AillieoUtils
             }
         }
 
-        public static Event operator + (Event evt, Action callback)
-        {
-            evt.AddListener(callback);
-            return evt;
-        }
+        //public static Event operator + (Event evt, Action callback)
+        //{
+        //    evt.AddListener(callback);
+        //    return evt;
+        //}
 
-        public static Event operator - (Event evt, Action callback)
-        {
-            evt.RemoveListener(callback);
-            return evt;
-        }
+        //public static Event operator - (Event evt, Handle handle)
+        //{
+        //    evt.Remove(handle);
+        //    return evt;
+        //}
+
+        //public static Event operator - (Event evt, Action callback)
+        //{
+        //    evt.RemoveListener(callback);
+        //    return evt;
+        //}
     }
 
     public class Handle

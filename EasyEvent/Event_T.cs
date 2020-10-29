@@ -33,7 +33,18 @@ namespace AillieoUtils
 
             return newHandle;
         }
-
+        
+        public Handle<T> ListenOnce(Action<T> callback)
+        {
+            Handle<T> handle = default;
+            handle = AddListener(arg =>
+            {
+                Remove(handle);
+                callback?.Invoke(arg);
+            });
+            return handle;
+        }
+        
         public bool Remove(Handle<T> handle)
         {
             if (this.head == null)
@@ -139,6 +150,16 @@ namespace AillieoUtils
 
         public void Invoke(T arg)
         {
+            InternalInvoke(arg, false);
+        }
+
+        public void SafeInvoke(T arg)
+        {
+            InternalInvoke(arg, true);
+        }
+
+        private void InternalInvoke(T arg, bool continueOnException)
+        {
             if (this.head == null)
             {
                 return;
@@ -158,7 +179,13 @@ namespace AillieoUtils
                     }
                     catch(Exception e)
                     {
-                        if(exceptions == null)
+                        if (!continueOnException)
+                        {
+                            this.lockCount--;
+                            throw;
+                        }
+
+                        if (exceptions == null)
                         {
                             exceptions = new List<Exception>();
                         }
@@ -222,17 +249,23 @@ namespace AillieoUtils
             }
         }
 
-        public static Event<T> operator + (Event<T> evt, Action<T> callback)
-        {
-            evt.AddListener(callback);
-            return evt;
-        }
+        //public static Event<T> operator + (Event<T> evt, Action<T> callback)
+        //{
+        //    evt.AddListener(callback);
+        //    return evt;
+        //}
 
-        public static Event<T> operator - (Event<T> evt, Action<T> callback)
-        {
-            evt.RemoveListener(callback);
-            return evt;
-        }
+        //public static Event<T> operator - (Event<T> evt, Handle<T> handle)
+        //{
+        //    evt.Remove(handle);
+        //    return evt;
+        //}
+
+        //public static Event<T> operator - (Event<T> evt, Action<T> callback)
+        //{
+        //    evt.RemoveListener(callback);
+        //    return evt;
+        //}
     }
 
     public class Handle<T>
