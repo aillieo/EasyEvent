@@ -135,13 +135,16 @@ namespace AillieoUtils
         {
             Handle<T> handle = this.head;
 
-            while (true)
+            if (handle != null)
             {
-                handle.callback = null;
-                handle = handle.next;
-                if (handle == null || handle == this.head)
+                while (true)
                 {
-                    break;
+                    handle.callback = null;
+                    handle = handle.next;
+                    if (handle == null || handle == this.head)
+                    {
+                        break;
+                    }
                 }
             }
 
