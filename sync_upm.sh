@@ -17,6 +17,8 @@ create_tag()
 		echo $n
 		echo `expr $n + 1`
 	done
+
+	git tag 1.0.0 upm
 }
 
 create_branch()
