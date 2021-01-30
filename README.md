@@ -6,7 +6,7 @@ EasyEvent provides the following interfaces to help you handle callbacks more ea
 
 1. AddListener/Remove/RemoveListener
 
-Unlike C# events, when a callback function is added as a listener, the EasyEvent instance returns a Handle, which is intended to facilitate the removal of anonymous methods and lambda expressions.
+Unlike C# events, when a callback function is added as a listener, the EasyEvent instance returns a `Handle`, which is intended to facilitate the removal of anonymous methods and lambda expressions.
 
 ```C#
 // add listener
@@ -19,7 +19,7 @@ evt.Invoke();
 // evt invoke
 ```
 
-To remove a listener, just call Remove and pass the handle. You can also use RemoveListener, but it is not efficient.
+To remove a listener, just call `Remove` and pass the handle. You can also use `RemoveListener`, but it is not efficient.
 
 ```C#
 Event evt = new Event();
@@ -33,7 +33,7 @@ evt.Remove(handle);
 
 2. ListenOnce
 
-In some cases, you only need to listen to an Event once and then remove it, and ListenOnce is ready for you.
+In some cases, you only need to listen to an Event once and then remove it, and `ListenOnce` is ready for you.
 
 ```C#
 Event evt = new Event();
@@ -64,5 +64,5 @@ evt.SafeInvoke();
 
 ## Usage
 
-Clone this repository and copy it to your project folder, or add `https://github.com/aillieo/EasyEvent.git#upm` as a dependency in the package management window.
+Clone this repository and copy it to your project folder, or add `https://github.com/aillieo/EasyEvent.git#upm` as a dependency in the Package Manager window.
 
