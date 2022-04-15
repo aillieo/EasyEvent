@@ -18,6 +18,16 @@ namespace AillieoUtils
             return GetEvent<T>(eventDef, true).AddListener(callback);
         }
 
+        public static Handle ListenOnece(string eventDef, Action callback)
+        {
+            return GetEvent(eventDef, true)?.ListenOnce(callback);
+        }
+
+        public static Handle<T> ListenOnece<T>(string eventDef, Action<T> callback)
+        {
+            return GetEvent<T>(eventDef, true)?.ListenOnce(callback);
+        }
+
         public static bool Remove(string eventDef, Handle handle)
         {
             Event evt = GetEvent(eventDef, false);
