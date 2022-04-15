@@ -1,10 +1,9 @@
 using System;
-using UnityEngine;
-using UnityEngine.Assertions;
-using Handle = AillieoUtils.Handle;
-using Event = AillieoUtils.Event;
+using AillieoUtils;
+using NUnit.Framework;
 
-public class TestCases : MonoBehaviour
+[Category("EventTest")]
+public class TestCases
 {
     private int memberCount = 0;
 
@@ -13,33 +12,8 @@ public class TestCases : MonoBehaviour
         this.memberCount++;
     }
 
-    private void Start()
-    {
-        this.TestEmptyInvoke();
-        this.TestInvoke();
-        this.TestInvoke2();
-        this.TestInvokeTwice();
-        this.TestAddRemove();
-        this.TestAddRemove2();
-        this.TestNestAdd();
-        this.TestListenOnce();
-        this.TestUnlisten();
-        this.TestRemoveHead();
-        this.TestRemoveHeadByFunc();
-        this.TestRemoveHeadAndAdd();
-        this.TestRemoveMiddle();
-        this.TestRemoveMiddleByFunc();
-        this.TestRemoveMiddleAndAdd();
-        this.TestRemoveTail();
-        this.TestRemoveTailByFunc();
-        this.TestRemoveTailAndAdd();
-        this.TestRemoveOnly();
-        this.TestRemoveOnlyByFunc();
-        this.TestRemoveOnlyAndAdd();
-        this.TestRemoveAll();
-    }
-
-    private void TestRemoveAll()
+    [Test]
+    public void TestRemoveAll()
     {
         int count1 = 0;
         int count2 = 0;
@@ -94,7 +68,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count3, 3);
     }
 
-    private void TestRemoveOnlyAndAdd()
+    [Test]
+    public void TestRemoveOnlyAndAdd()
     {
         Event evt = new Event();
         int count = 0;
@@ -122,7 +97,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count, 2);
     }
 
-    private void TestRemoveOnlyByFunc()
+    [Test]
+    public void TestRemoveOnlyByFunc()
     {
         this.memberCount = 0;
         Event evt = new Event();
@@ -140,7 +116,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(this.memberCount, 1);
     }
 
-    private void TestRemoveOnly()
+    [Test]
+    public void TestRemoveOnly()
     {
         Event evt = new Event();
         int count = 0;
@@ -161,7 +138,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count, 1);
     }
 
-    private void TestInvoke()
+    [Test]
+    public void TestInvoke()
     {
         Event evt = new Event();
         int count = 0;
@@ -177,7 +155,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count, 2);
     }
 
-    private void TestInvokeTwice()
+    [Test]
+    public void TestInvokeTwice()
     {
         Event evt = new Event();
 
@@ -193,7 +172,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count, 2);
     }
 
-    private void TestUnlisten()
+    [Test]
+    public void TestUnlisten()
     {
         Event evt = new Event();
         int count = 0;
@@ -214,7 +194,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count, 1);
     }
 
-    private void TestAddRemove2()
+    [Test]
+    public void TestAddRemove2()
     {
         int count = 0;
         this.memberCount = 0;
@@ -266,13 +247,15 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(this.memberCount, 6);
     }
 
-    private void TestEmptyInvoke()
+    [Test]
+    public void TestEmptyInvoke()
     {
         Event evt = new Event();
         evt.Invoke();
     }
 
-    private void TestInvoke2()
+    [Test]
+    public void TestInvoke2()
     {
         int counter1 = 0;
         int counter2 = 0;
@@ -294,7 +277,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(1, counter2);
     }
 
-    private void TestAddRemove()
+    [Test]
+    public void TestAddRemove()
     {
         int counter1 = 0;
         int counter2 = 0;
@@ -320,7 +304,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(1, counter2);
     }
 
-    private void TestNestAdd()
+    [Test]
+    public void TestNestAdd()
     {
         int counter1 = 0;
         int counter2 = 0;
@@ -341,7 +326,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(1, counter2);
     }
 
-    private void TestListenOnce()
+    [Test]
+    public void TestListenOnce()
     {
         int counter = 0;
 
@@ -360,7 +346,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(1, counter);
     }
 
-    private void TestRemoveHeadAndAdd()
+    [Test]
+    public void TestRemoveHeadAndAdd()
     {
         int count1 = 0;
         int count2 = 0;
@@ -401,7 +388,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count3, 2);
     }
 
-    private void TestRemoveHeadByFunc()
+    [Test]
+    public void TestRemoveHeadByFunc()
     {
         this.memberCount = 0;
         int count2 = 0;
@@ -429,7 +417,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count2, 2);
     }
 
-    private void TestRemoveHead()
+    [Test]
+    public void TestRemoveHead()
     {
         int count1 = 0;
         int count2 = 0;
@@ -460,7 +449,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count2, 2);
     }
 
-    private void TestRemoveMiddleAndAdd()
+    [Test]
+    public void TestRemoveMiddleAndAdd()
     {
         int count1 = 0;
         int count2 = 0;
@@ -510,7 +500,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count3, 2);
     }
 
-    private void TestRemoveMiddleByFunc()
+    [Test]
+    public void TestRemoveMiddleByFunc()
     {
         this.memberCount = 0;
         int count2 = 0;
@@ -548,7 +539,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count2, 2);
     }
 
-    private void TestRemoveMiddle()
+    [Test]
+    public void TestRemoveMiddle()
     {
         int count1 = 0;
         int count2 = 0;
@@ -589,7 +581,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count2, 2);
     }
 
-    private void TestRemoveTailAndAdd()
+    [Test]
+    public void TestRemoveTailAndAdd()
     {
         int count1 = 0;
         int count2 = 0;
@@ -630,7 +623,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count3, 0);
     }
 
-    private void TestRemoveTailByFunc()
+    [Test]
+    public void TestRemoveTailByFunc()
     {
         this.memberCount = 0;
         int count2 = 0;
@@ -658,7 +652,8 @@ public class TestCases : MonoBehaviour
         Assert.AreEqual(count2, 2);
     }
 
-    private void TestRemoveTail()
+    [Test]
+    public void TestRemoveTail()
     {
         int count1 = 0;
         int count2 = 0;
