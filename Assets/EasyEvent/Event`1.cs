@@ -33,7 +33,7 @@ namespace AillieoUtils
 
             return newHandle;
         }
-        
+
         public Handle<T> ListenOnce(Action<T> callback)
         {
             Handle<T> handle = default;
@@ -44,7 +44,7 @@ namespace AillieoUtils
             });
             return handle;
         }
-        
+
         public bool Remove(Handle<T> handle)
         {
             if (this.head == null)
@@ -120,7 +120,7 @@ namespace AillieoUtils
                     }
 
                     handle = handle.next;
-                    
+
                     if (handle == null || handle == this.head)
                     {
                         break;
@@ -271,7 +271,7 @@ namespace AillieoUtils
         //}
     }
 
-    public class Handle<T>
+    public class Handle<T> : IEventHandle
     {
         internal readonly Event<T> owner;
 

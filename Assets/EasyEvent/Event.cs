@@ -44,7 +44,7 @@ namespace AillieoUtils
             });
             return handle;
         }
-        
+
         public bool Remove(Handle handle)
         {
             if (this.head == null)
@@ -120,7 +120,7 @@ namespace AillieoUtils
                     }
 
                     handle = handle.next;
-                    
+
                     if (handle == null || handle == this.head)
                     {
                         break;
@@ -271,7 +271,7 @@ namespace AillieoUtils
         //}
     }
 
-    public class Handle
+    public class Handle : IEventHandle
     {
         internal readonly Event owner;
 
