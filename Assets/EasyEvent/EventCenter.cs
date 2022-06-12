@@ -5,32 +5,31 @@ namespace AillieoUtils
 
     public static class EventCenter
     {
-        private static readonly Dictionary<string, Event> mappings = new Dictionary<string, Event>();
-        private static readonly Dictionary<Type, Dictionary<string, object>> mappings_1 = new Dictionary<Type, Dictionary<string, object>>();
+        private static readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>();
 
-        public static Handle AddListener(string eventDef, Action callback)
+        public static Handle<object> AddListener(string eventDef, Action callback)
+        {
+            return GetEvent(eventDef, true).AddListener(_ => callback());
+        }
+
+        public static Handle<object> AddListener(string eventDef, Action<object> callback)
         {
             return GetEvent(eventDef, true).AddListener(callback);
         }
 
-        public static Handle<T> AddListener<T>(string eventDef, Action<T> callback)
+        public static Handle<object> ListenOnece(string eventDef, Action callback)
         {
-            return GetEvent<T>(eventDef, true).AddListener(callback);
+            return GetEvent(eventDef, true)?.ListenOnce(_ => callback());
         }
 
-        public static Handle ListenOnece(string eventDef, Action callback)
+        public static Handle<object> ListenOnece(string eventDef, Action<object> callback)
         {
             return GetEvent(eventDef, true)?.ListenOnce(callback);
         }
 
-        public static Handle<T> ListenOnece<T>(string eventDef, Action<T> callback)
+        public static bool Remove(string eventDef, Handle<object> handle)
         {
-            return GetEvent<T>(eventDef, true)?.ListenOnce(callback);
-        }
-
-        public static bool Remove(string eventDef, Handle handle)
-        {
-            Event evt = GetEvent(eventDef, false);
+            Event<object> evt = GetEvent(eventDef, false);
             if (evt != null)
             {
                 return evt.Remove(handle);
@@ -39,31 +38,9 @@ namespace AillieoUtils
             return false;
         }
 
-        public static bool Remove<T>(string eventDef, Handle<T> handle)
+        public static int RemoveListener(string eventDef, Action<object> callback)
         {
-            Event<T> evt = GetEvent<T>(eventDef, false);
-            if (evt != null)
-            {
-                return evt.Remove(handle);
-            }
-
-            return false;
-        }
-
-        public static int RemoveListener(string eventDef, Action callback)
-        {
-            Event evt = GetEvent(eventDef, false);
-            if (evt != null)
-            {
-                return evt.RemoveListener(callback);
-            }
-
-            return 0;
-        }
-
-        public static int RemoveListener<T>(string eventDef, Action<T> callback)
-        {
-            Event<T> evt = GetEvent<T>(eventDef, false);
+            Event<object> evt = GetEvent(eventDef, false);
             if (evt != null)
             {
                 return evt.RemoveListener(callback);
@@ -77,53 +54,35 @@ namespace AillieoUtils
             GetEvent(eventDef, false)?.RemoveAllListeners();
         }
 
-        public static void RemoveAllListeners<T>(string eventDef)
+        public static void Invoke(string eventDef, object arg = null)
         {
-            GetEvent<T>(eventDef, false)?.RemoveAllListeners();
-        }
-
-        public static void Invoke(string eventDef)
-        {
-            GetEvent(eventDef, false)?.Invoke();
-        }
-
-        public static void Invoke<T>(string eventDef, T arg)
-        {
-            GetEvent<T>(eventDef, false)?.Invoke(arg);
+            GetEvent(eventDef, false)?.Invoke(arg);
         }
 
         public static void Clear()
         {
+            foreach (var pair in mappings)
+            {
+                pair.Value.RemoveAllListeners();
+            }
+
             mappings.Clear();
-            mappings_1.Clear();
         }
 
-        private static Event GetEvent(string eventDef, bool createIfNotExist)
+        private static Event<object> GetEvent(string eventDef, bool createIfNotExist)
         {
-            if (!mappings.TryGetValue(eventDef, out Event evt) && createIfNotExist)
+            if (string.IsNullOrEmpty(eventDef))
             {
-                evt = new Event();
+                throw new ArgumentException($"Argument null or empty: {nameof(eventDef)}");
+            }
+
+            if (!mappings.TryGetValue(eventDef, out Event<object> evt) && createIfNotExist)
+            {
+                evt = new Event<object>();
                 mappings.Add(eventDef, evt);
             }
 
             return evt;
-        }
-
-        private static Event<T> GetEvent<T>(string eventDef, bool createIfNotExist)
-        {
-            if (!mappings_1.TryGetValue(typeof(T), out Dictionary<string, object> innerMap) && createIfNotExist)
-            {
-                innerMap = new Dictionary<string, object>();
-                mappings_1.Add(typeof(T), innerMap);
-            }
-
-            if (!innerMap.TryGetValue(eventDef, out object evt) && createIfNotExist)
-            {
-                evt = new Event<T>();
-                innerMap.Add(eventDef, evt);
-            }
-
-            return evt as Event<T>;
         }
     }
 }

@@ -13,6 +13,11 @@ namespace AillieoUtils
 
         public Handle<T> AddListener(Action<T> callback)
         {
+            if (callback == null)
+            {
+                throw new ArgumentNullException(nameof(callback));
+            }
+
             Handle<T> newHandle = new Handle<T>(callback, this);
 
             if (this.head == null)
