@@ -2,7 +2,13 @@
 
 Another choice to build your event systems in C#.
 
-EasyEvent provides the following interfaces to help you handle callbacks more easily:
+EasyEvent provides interfaces to make it easier and more efficient to manage callbacks, and the built-in EventCenter can be used as an out-of-the-box messaging system when starting a new project.
+
+## Installation
+
+Clone this repository and copy it to your project folder, or add `https://github.com/aillieo/EasyEvent.git#upm` as a dependency in the Package Manager window.
+
+## Quick Start
 
 1. AddListener/Remove/RemoveListener
 
@@ -19,7 +25,7 @@ evt.Invoke();
 // evt invoke
 ```
 
-To remove a listener, just call `Remove` and pass the handle. You can also use `RemoveListener`, but it is not efficient.
+To remove a listener, simply call `Remove` and pass the handle. You can also use `RemoveListener`, but it is not efficient.
 
 ```C#
 Event evt = new Event();
@@ -61,8 +67,3 @@ evt.SafeInvoke();
 // evt invoke
 // Exception: Exception of type 'System.Exception' was thrown.
 ```
-
-## Usage
-
-Clone this repository and copy it to your project folder, or add `https://github.com/aillieo/EasyEvent.git#upm` as a dependency in the Package Manager window.
-

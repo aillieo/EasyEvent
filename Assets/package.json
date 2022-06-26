@@ -3,7 +3,7 @@
     "displayName": "AillieoUtils EasyEvents",
     "description": "AillieoUtils EasyEvents",
     "version": "1.0.0",
-    "unity": "2018.4",
+    "unity": "2019.4",
     "license": "MIT",
     "dependencies": {
 
