@@ -1,16 +1,34 @@
+// -----------------------------------------------------------------------
+// <copyright file="Event`1.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace AillieoUtils
 {
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Event with one generic argument.
+    /// </summary>
+    /// <typeparam name="T">Type of argument.</typeparam>
     public class Event<T>
     {
         private int lockCount;
 
         private Handle<T> head;
 
+        /// <summary>
+        /// Gets the count of listeners currently registered to this event.
+        /// </summary>
         public int ListenerCount { get; private set; }
 
+        /// <summary>
+        /// Add listener to this event.
+        /// </summary>
+        /// <param name="callback">Callback for this event.</param>
+        /// <returns>Handle for this listener.</returns>
         public Handle<T> AddListener(Action<T> callback)
         {
             if (callback == null)
@@ -39,17 +57,27 @@ namespace AillieoUtils
             return newHandle;
         }
 
+        /// <summary>
+        /// Add listener to this event and remove it after event invoked.
+        /// </summary>
+        /// <param name="callback">Callback for this event.</param>
+        /// <returns>Handle for this listener.</returns>
         public Handle<T> ListenOnce(Action<T> callback)
         {
             Handle<T> handle = default;
-            handle = AddListener(arg =>
+            handle = this.AddListener(arg =>
             {
-                Remove(handle);
+                this.Remove(handle);
                 callback?.Invoke(arg);
             });
             return handle;
         }
 
+        /// <summary>
+        /// Remove a listener by handle.
+        /// </summary>
+        /// <param name="handle">Handle for the listener.</param>
+        /// <returns>Remove succeed.</returns>
         public bool Remove(Handle<T> handle)
         {
             if (this.head == null)
@@ -104,6 +132,11 @@ namespace AillieoUtils
             return true;
         }
 
+        /// <summary>
+        /// Remove a listener.
+        /// </summary>
+        /// <param name="callback">The listener.</param>
+        /// <returns>Count of removed listener instances.</returns>
         public int RemoveListener(Action<T> callback)
         {
             if (callback == null)
@@ -112,7 +145,7 @@ namespace AillieoUtils
             }
 
             Handle<T> handle = this.head;
-            int oldListenerCount = ListenerCount;
+            int oldListenerCount = this.ListenerCount;
 
             if (handle != null)
             {
@@ -121,7 +154,7 @@ namespace AillieoUtils
                     if (handle.callback == callback)
                     {
                         handle.callback = null;
-                        ListenerCount--;
+                        this.ListenerCount--;
                     }
 
                     handle = handle.next;
@@ -133,9 +166,12 @@ namespace AillieoUtils
                 }
             }
 
-            return oldListenerCount - ListenerCount;
+            return oldListenerCount - this.ListenerCount;
         }
 
+        /// <summary>
+        /// Remove all listeners registered.
+        /// </summary>
         public void RemoveAllListeners()
         {
             Handle<T> handle = this.head;
@@ -156,14 +192,22 @@ namespace AillieoUtils
             this.ListenerCount = 0;
         }
 
+        /// <summary>
+        /// Invoke the event.
+        /// </summary>
+        /// <param name="arg">Argument for event invoking.</param>
         public void Invoke(T arg)
         {
-            InternalInvoke(arg, false);
+            this.InternalInvoke(arg, false);
         }
 
+        /// <summary>
+        /// Invoke the event, exceptions (if any) will aggregate and throw once.
+        /// </summary>
+        /// <param name="arg">Argument for event invoking.</param>
         public void SafeInvoke(T arg)
         {
-            InternalInvoke(arg, true);
+            this.InternalInvoke(arg, true);
         }
 
         private void InternalInvoke(T arg, bool continueOnException)
@@ -185,7 +229,7 @@ namespace AillieoUtils
                     {
                         handle.callback(arg);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         if (!continueOnException)
                         {
@@ -197,6 +241,7 @@ namespace AillieoUtils
                         {
                             exceptions = new List<Exception>();
                         }
+
                         exceptions.Add(e);
                     }
                     finally
@@ -229,7 +274,6 @@ namespace AillieoUtils
                             handle.next = null;
                             handle.previous = null;
                             handle = this.head;
-                            continue;
                         }
                         else
                         {
@@ -251,31 +295,17 @@ namespace AillieoUtils
 
             this.lockCount--;
 
-            if(exceptions != null)
+            if (exceptions != null)
             {
                 throw new AggregateException(exceptions);
             }
         }
-
-        //public static Event<T> operator + (Event<T> evt, Action<T> callback)
-        //{
-        //    evt.AddListener(callback);
-        //    return evt;
-        //}
-
-        //public static Event<T> operator - (Event<T> evt, Handle<T> handle)
-        //{
-        //    evt.Remove(handle);
-        //    return evt;
-        //}
-
-        //public static Event<T> operator - (Event<T> evt, Action<T> callback)
-        //{
-        //    evt.RemoveListener(callback);
-        //    return evt;
-        //}
     }
 
+    /// <summary>
+    /// A Handle records a registration of a listener.
+    /// </summary>
+    /// <typeparam name="T">Type of argument.</typeparam>
     public class Handle<T> : IEventHandle
     {
         internal readonly Event<T> owner;
@@ -292,6 +322,7 @@ namespace AillieoUtils
             this.owner = owner;
         }
 
+        /// <inheritdoc/>
         public bool Unlisten()
         {
             if (this.callback != null)
