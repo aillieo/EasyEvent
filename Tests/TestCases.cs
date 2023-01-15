@@ -691,4 +691,21 @@ public class TestCases
         Assert.AreEqual(count2, 2);
         Assert.AreEqual(count3, 0);
     }
+
+    [Test]
+    public void TestWithExceptions()
+    {
+        int count0 = 0;
+
+        Event evt = new Event();
+        evt.AddListener(() => throw new InvalidOperationException());
+        evt.AddListener(() => count0++);
+        evt.AddListener(() => throw new InvalidOperationException());
+
+        Assert.Throws<InvalidOperationException>(() => evt.Invoke());
+        Assert.AreEqual(count0, 0);
+
+        Assert.Throws<AggregateException>(() => evt.InvokeAll());
+        Assert.AreEqual(count0, 1);
+    }
 }

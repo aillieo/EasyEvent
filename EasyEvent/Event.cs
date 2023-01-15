@@ -200,11 +200,81 @@ namespace AillieoUtils
         }
 
         /// <summary>
-        /// Invoke the event, exceptions (if any) will aggregate and throw once.
+        /// Invoke the event, exceptions (if any) will be aggregated and throw once.
         /// </summary>
-        public void SafeInvoke()
+        public void InvokeAll()
         {
             this.InternalInvoke(true);
+        }
+
+        /// <summary>
+        /// Invoke the event.
+        /// </summary>
+        /// <param name="errorHandler">Handler for exceptions.</param>
+        /// <returns>Invocation succeeds with no exceptions.</returns>
+        public bool SafeInvoke(Action<Exception> errorHandler = null)
+        {
+            try
+            {
+                this.Invoke();
+            }
+            catch (Exception exception)
+            {
+                if (errorHandler == null)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+                else
+                {
+                    try
+                    {
+                        errorHandler(exception);
+                    }
+                    catch (Exception handlerException)
+                    {
+                        UnityEngine.Debug.LogException(handlerException);
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Invoke the event, exceptions (if any) will be aggregated and throw once.
+        /// </summary>
+        /// <param name="errorHandler">Handler for exceptions.</param>
+        /// <returns>Invocation succeeds with no exceptions.</returns>
+        public bool SafeInvokeAll(Action<Exception> errorHandler = null)
+        {
+            try
+            {
+                this.InvokeAll();
+            }
+            catch (Exception exception)
+            {
+                if (errorHandler == null)
+                {
+                    UnityEngine.Debug.LogException(exception);
+                }
+                else
+                {
+                    try
+                    {
+                        errorHandler(exception);
+                    }
+                    catch (Exception handlerException)
+                    {
+                        UnityEngine.Debug.LogException(handlerException);
+                    }
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         private void InternalInvoke(bool continueOnException)

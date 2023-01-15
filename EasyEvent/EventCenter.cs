@@ -14,7 +14,7 @@ namespace AillieoUtils
     /// </summary>
     public static class EventCenter
     {
-        private static readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>();
+        private static readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>(StringComparer.Ordinal);
 
         /// <summary>
         /// Add listener to the named event.
