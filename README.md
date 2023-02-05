@@ -53,7 +53,7 @@ evt.Invoke();
 // will output nothing
 ```
 
-3. SafeInvoke
+3. InvokeAll
 
 The invocation continues when exception occurs and the exceptions are aggregated and thrown when the event call ends;
 

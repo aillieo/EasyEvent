@@ -35,7 +35,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle newHandle = new Handle(callback, this);
+            var newHandle = new Handle(callback, this);
 
             if (this.head == null)
             {
@@ -79,12 +79,12 @@ namespace AillieoUtils
         /// <returns>Remove succeed.</returns>
         public bool Remove(Handle handle)
         {
-            if (this.head == null)
+            if (handle == null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(handle));
             }
 
-            if (handle == null)
+            if (this.head == null)
             {
                 return false;
             }
@@ -140,11 +140,11 @@ namespace AillieoUtils
         {
             if (callback == null)
             {
-                return 0;
+                throw new ArgumentNullException(nameof(callback));
             }
 
             Handle handle = this.head;
-            int oldListenerCount = this.ListenerCount;
+            var oldListenerCount = this.ListenerCount;
 
             if (handle != null)
             {

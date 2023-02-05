@@ -12,9 +12,11 @@ namespace AillieoUtils
     /// <summary>
     /// Manage events by string key.
     /// </summary>
-    public static class EventCenter
+    public class EventCenter
     {
-        private static readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>(StringComparer.Ordinal);
+        internal readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>(StringComparer.Ordinal);
+
+        private static readonly EventCenter defaultInstance = new EventCenter();
 
         /// <summary>
         /// Add listener to the named event.
@@ -24,7 +26,7 @@ namespace AillieoUtils
         /// <returns>Handle for this listener.</returns>
         public static Handle<object> AddListener(string eventDef, Action callback)
         {
-            return GetEvent(eventDef, true).AddListener(_ => callback());
+            return defaultInstance.AddListener(eventDef, callback);
         }
 
         /// <summary>
@@ -35,7 +37,7 @@ namespace AillieoUtils
         /// <returns>Handle for this listener.</returns>
         public static Handle<object> AddListener(string eventDef, Action<object> callback)
         {
-            return GetEvent(eventDef, true).AddListener(callback);
+            return defaultInstance.AddListener(eventDef, callback);
         }
 
         /// <summary>
@@ -44,9 +46,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> ListenOnece(string eventDef, Action callback)
+        public static Handle<object> ListenOnce(string eventDef, Action callback)
         {
-            return GetEvent(eventDef, true)?.ListenOnce(_ => callback());
+            return defaultInstance.ListenOnce(eventDef, callback);
         }
 
         /// <summary>
@@ -55,9 +57,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> ListenOnece(string eventDef, Action<object> callback)
+        public static Handle<object> ListenOnce(string eventDef, Action<object> callback)
         {
-            return GetEvent(eventDef, true)?.ListenOnce(callback);
+            return defaultInstance.ListenOnce(eventDef, callback);
         }
 
         /// <summary>
@@ -68,13 +70,7 @@ namespace AillieoUtils
         /// <returns>Remove succeed.</returns>
         public static bool Remove(string eventDef, Handle<object> handle)
         {
-            Event<object> evt = GetEvent(eventDef, false);
-            if (evt != null)
-            {
-                return evt.Remove(handle);
-            }
-
-            return false;
+            return defaultInstance.Remove(eventDef, handle);
         }
 
         /// <summary>
@@ -85,13 +81,7 @@ namespace AillieoUtils
         /// <returns>Count of removed listener instances.</returns>
         public static int RemoveListener(string eventDef, Action<object> callback)
         {
-            Event<object> evt = GetEvent(eventDef, false);
-            if (evt != null)
-            {
-                return evt.RemoveListener(callback);
-            }
-
-            return 0;
+            return defaultInstance.RemoveListener(eventDef, callback);
         }
 
         /// <summary>
@@ -100,7 +90,7 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         public static void RemoveAllListeners(string eventDef)
         {
-            GetEvent(eventDef, false)?.RemoveAllListeners();
+            defaultInstance.RemoveAllListeners(eventDef);
         }
 
         /// <summary>
@@ -110,7 +100,17 @@ namespace AillieoUtils
         /// <param name="arg">Argument for event invoking.</param>
         public static void Invoke(string eventDef, object arg = null)
         {
-            GetEvent(eventDef, false)?.Invoke(arg);
+            defaultInstance.Invoke(eventDef, arg);
+        }
+
+        /// <summary>
+        /// Invoke the event, exceptions (if any) will be aggregated and throw once.
+        /// </summary>
+        /// <param name="eventDef">Name of the event.</param>
+        /// <param name="arg">Argument for event invoking.</param>
+        public static void InvokeAll(string eventDef, object arg = null)
+        {
+            defaultInstance.InvokeAll(eventDef, arg);
         }
 
         /// <summary>
@@ -118,25 +118,20 @@ namespace AillieoUtils
         /// </summary>
         public static void Clear()
         {
-            foreach (var pair in mappings)
-            {
-                pair.Value.RemoveAllListeners();
-            }
-
-            mappings.Clear();
+            defaultInstance.Clear();
         }
 
-        private static Event<object> GetEvent(string eventDef, bool createIfNotExist)
+        internal Event<object> GetEvent(string eventDef, bool createIfNotExist)
         {
             if (string.IsNullOrEmpty(eventDef))
             {
                 throw new ArgumentException($"Argument null or empty: {nameof(eventDef)}");
             }
 
-            if (!mappings.TryGetValue(eventDef, out Event<object> evt) && createIfNotExist)
+            if (!this.mappings.TryGetValue(eventDef, out Event<object> evt) && createIfNotExist)
             {
                 evt = new Event<object>();
-                mappings.Add(eventDef, evt);
+                this.mappings.Add(eventDef, evt);
             }
 
             return evt;
