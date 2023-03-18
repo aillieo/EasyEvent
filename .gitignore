@@ -22,6 +22,7 @@
 *.unityproj
 *.booproj
 .vs/
+.vsconfig
  
 # ============ #
 # OS generated #
@@ -38,3 +39,13 @@ Thumbs.db
 # Rider #
 # ===== #
 .idea/
+
+# ================== #
+# Visual Studio Code #
+# ================== #
+.vscode/
+
+# ==================== #
+# Editor user settings #
+# ==================== #
+/[Uu]serSettings/EditorUserSettings.asset

@@ -1,13 +1,11 @@
-*    text=auto
-# Text files
-*.cs diff=csharp text
+*.cs text diff=csharp
+*.shader text
 *.txt text
 *.mat text
 *.shader text
+*.cginc text
 *.meta text
-*.md5 text
 *.compute text
 *.md text
 *.prefab text
 */ProjectSettings/*.asset text
-

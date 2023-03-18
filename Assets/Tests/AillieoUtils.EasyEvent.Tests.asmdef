@@ -1,9 +1,10 @@
 {
     "name": "AillieoUtils.EasyEvent.Tests",
+    "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
-        "AillieoUtils.EasyEvents"
+        "AillieoUtils.EasyEvent"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

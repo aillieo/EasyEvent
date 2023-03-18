@@ -1,7 +1,7 @@
 {
     "name": "com.aillieo.easy-events",
-    "displayName": "AillieoUtils EasyEvents",
-    "description": "AillieoUtils EasyEvents",
+    "displayName": "AillieoUtils EasyEvent",
+    "description": "EasyEvent provides interfaces to make it easier and more efficient to manage callbacks, and the built-in EventCenter can be used as an out-of-the-box messaging system when starting a new project.",
     "version": "1.0.0",
     "unity": "2019.4",
     "license": "MIT",

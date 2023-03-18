@@ -27,7 +27,7 @@ public class Performance
         }
     }
 
-    private AillieoUtils.Event event1 = new Event();
+    private EasyDelegate event1 = new EasyDelegate();
     private UnityEngine.Events.UnityEvent event2 = new UnityEngine.Events.UnityEvent();
     private event Action event3;
 

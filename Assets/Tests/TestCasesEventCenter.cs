@@ -17,10 +17,10 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event01";
-        Handle<object> handle = EventCenter.AddListener(eventDef, () => counter++);
-        EventCenter.Invoke(eventDef);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, () => counter++);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 1);
-        EventCenter.Invoke(eventDef);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 2);
     }
 
@@ -29,10 +29,10 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event02";
-        Handle<object> handle = EventCenter.AddListener(eventDef, n => counter += (int)n);
-        EventCenter.Invoke(eventDef, 1);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, n => counter += (int)n);
+        EventCenter.Default.Invoke(eventDef, 1);
         Assert.AreEqual(counter, 1);
-        EventCenter.Invoke(eventDef, 2);
+        EventCenter.Default.Invoke(eventDef, 2);
         Assert.AreEqual(counter, 3);
     }
 
@@ -41,11 +41,11 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event03";
-        Handle<object> handle = EventCenter.AddListener(eventDef, () => counter++);
-        EventCenter.Invoke(eventDef);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, () => counter++);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 1);
-        EventCenter.Remove(eventDef, handle);
-        EventCenter.Invoke(eventDef);
+        EventCenter.Default.Remove(eventDef, handle);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 1);
     }
 
@@ -54,11 +54,11 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event04";
-        Handle<object> handle = EventCenter.AddListener(eventDef, n => counter++);
-        EventCenter.Invoke(eventDef, 1);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, n => counter++);
+        EventCenter.Default.Invoke(eventDef, 1);
         Assert.AreEqual(counter, 1);
-        EventCenter.Remove(eventDef, handle);
-        EventCenter.Invoke(eventDef, 1);
+        EventCenter.Default.Remove(eventDef, handle);
+        EventCenter.Default.Invoke(eventDef, 1);
         Assert.AreEqual(counter, 1);
     }
 
@@ -67,11 +67,11 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event05";
-        Handle<object> handle = EventCenter.AddListener(eventDef, () => counter++);
-        EventCenter.Invoke(eventDef);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, () => counter++);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 1);
         handle.Unlisten();
-        EventCenter.Invoke(eventDef);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(counter, 1);
     }
 
@@ -80,11 +80,11 @@ public class TestCasesEventCenter
     {
         int counter = 0;
         string eventDef = "event06";
-        Handle<object> handle = EventCenter.AddListener(eventDef, n => counter++);
-        EventCenter.Invoke(eventDef, 1);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, n => counter++);
+        EventCenter.Default.Invoke(eventDef, 1);
         Assert.AreEqual(counter, 1);
         handle.Unlisten();
-        EventCenter.Invoke(eventDef, 1);
+        EventCenter.Default.Invoke(eventDef, 1);
         Assert.AreEqual(counter, 1);
     }
 
@@ -93,11 +93,11 @@ public class TestCasesEventCenter
     {
         memberCount = 0;
         string eventDef = "event07";
-        Handle<object> handle = EventCenter.AddListener(eventDef, CountAdd);
-        EventCenter.Invoke(eventDef);
+        Handle<object> handle = EventCenter.Default.AddListener(eventDef, CountAdd);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(memberCount, 1);
-        EventCenter.RemoveListener(eventDef, CountAdd);
-        EventCenter.Invoke(eventDef);
+        EventCenter.Default.RemoveListener(eventDef, CountAdd);
+        EventCenter.Default.Invoke(eventDef);
         Assert.AreEqual(memberCount, 1);
     }
 
@@ -107,16 +107,16 @@ public class TestCasesEventCenter
         int counter = 0;
         string eventDef1 = "event08";
         string eventDef2 = "event09";
-        Handle<object> handle1 = EventCenter.AddListener(eventDef1, () => counter++);
-        Handle<object> handle2 = EventCenter.AddListener(eventDef2, () => counter += 2);
-        EventCenter.Invoke(eventDef1);
+        Handle<object> handle1 = EventCenter.Default.AddListener(eventDef1, () => counter++);
+        Handle<object> handle2 = EventCenter.Default.AddListener(eventDef2, () => counter += 2);
+        EventCenter.Default.Invoke(eventDef1);
         Assert.AreEqual(counter, 1);
-        EventCenter.Invoke(eventDef2);
+        EventCenter.Default.Invoke(eventDef2);
         Assert.AreEqual(counter, 3);
-        EventCenter.Clear();
-        EventCenter.Invoke(eventDef1);
+        EventCenter.Default.Clear();
+        EventCenter.Default.Invoke(eventDef1);
         Assert.AreEqual(counter, 3);
-        EventCenter.Invoke(eventDef2);
+        EventCenter.Default.Invoke(eventDef2);
         Assert.AreEqual(counter, 3);
     }
 
@@ -126,16 +126,16 @@ public class TestCasesEventCenter
         int counter = 0;
         string eventDef1 = "event10";
         string eventDef2 = "event11";
-        Handle<object> handle1 = EventCenter.AddListener(eventDef1, n => counter++);
-        Handle<object> handle2 = EventCenter.AddListener(eventDef2, s => counter += 2);
-        EventCenter.Invoke(eventDef1, 1);
+        Handle<object> handle1 = EventCenter.Default.AddListener(eventDef1, n => counter++);
+        Handle<object> handle2 = EventCenter.Default.AddListener(eventDef2, s => counter += 2);
+        EventCenter.Default.Invoke(eventDef1, 1);
         Assert.AreEqual(counter, 1);
-        EventCenter.Invoke(eventDef2, "1");
+        EventCenter.Default.Invoke(eventDef2, "1");
         Assert.AreEqual(counter, 3);
-        EventCenter.Clear();
-        EventCenter.Invoke(eventDef1, 1);
+        EventCenter.Default.Clear();
+        EventCenter.Default.Invoke(eventDef1, 1);
         Assert.AreEqual(counter, 3);
-        EventCenter.Invoke(eventDef2, "1");
+        EventCenter.Default.Invoke(eventDef2, "1");
         Assert.AreEqual(counter, 3);
     }
 }
