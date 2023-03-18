@@ -1,6 +1,6 @@
 ## Easy Event
 
-Another choice to build your event systems in C#.
+An alternative to build your event systems in C#.
 
 EasyEvent provides interfaces to make it easier and more efficient to manage callbacks, and the built-in EventCenter can be used as an out-of-the-box messaging system when starting a new project.
 

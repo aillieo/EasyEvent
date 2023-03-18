@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="Event`1.cs" company="AillieoTech">
+// <copyright file="EasyDelegate`1.cs" company="AillieoTech">
 // Copyright (c) AillieoTech. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -10,10 +10,10 @@ namespace AillieoUtils
     using System.Collections.Generic;
 
     /// <summary>
-    /// Event with one generic argument.
+    /// Delegate with one generic argument and no return value.
     /// </summary>
     /// <typeparam name="T">Type of argument.</typeparam>
-    public class Event<T>
+    public class EasyDelegate<T> : IListenable<T>, IInvokable<T>
     {
         private int lockCount;
 
@@ -23,6 +23,11 @@ namespace AillieoUtils
         /// Gets the count of listeners currently registered to this event.
         /// </summary>
         public int ListenerCount { get; private set; }
+
+        public static implicit operator EasyEvent<T>(EasyDelegate<T> del)
+        {
+            return new EasyEvent<T>(del);
+        }
 
         /// <summary>
         /// Add listener to this event.
@@ -55,22 +60,6 @@ namespace AillieoUtils
             this.ListenerCount++;
 
             return newHandle;
-        }
-
-        /// <summary>
-        /// Add listener to this event and remove it after event invoked.
-        /// </summary>
-        /// <param name="callback">Callback for this event.</param>
-        /// <returns>Handle for this listener.</returns>
-        public Handle<T> ListenOnce(Action<T> callback)
-        {
-            Handle<T> handle = default;
-            handle = this.AddListener(arg =>
-            {
-                this.Remove(handle);
-                callback?.Invoke(arg);
-            });
-            return handle;
         }
 
         /// <summary>
@@ -210,78 +199,6 @@ namespace AillieoUtils
             this.InternalInvoke(arg, true);
         }
 
-        /// <summary>
-        /// Invoke the event.
-        /// </summary>
-        /// <param name="arg">Argument for event invoking.</param>
-        /// <param name="errorHandler">Handler for exceptions.</param>
-        /// <returns>Invocation succeeds with no exceptions.</returns>
-        public bool SafeInvoke(T arg, Action<Exception> errorHandler = null)
-        {
-            try
-            {
-                this.Invoke(arg);
-            }
-            catch (Exception exception)
-            {
-                if (errorHandler == null)
-                {
-                    UnityEngine.Debug.LogException(exception);
-                }
-                else
-                {
-                    try
-                    {
-                        errorHandler(exception);
-                    }
-                    catch (Exception handlerException)
-                    {
-                        UnityEngine.Debug.LogException(handlerException);
-                    }
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Invoke the event, exceptions (if any) will be aggregated and throw once.
-        /// </summary>
-        /// <param name="arg">Argument for event invoking.</param>
-        /// <param name="errorHandler">Handler for exceptions.</param>
-        /// <returns>Invocation succeeds with no exceptions.</returns>
-        public bool SafeInvokeAll(T arg, Action<Exception> errorHandler = null)
-        {
-            try
-            {
-                this.InvokeAll(arg);
-            }
-            catch (Exception exception)
-            {
-                if (errorHandler == null)
-                {
-                    UnityEngine.Debug.LogException(exception);
-                }
-                else
-                {
-                    try
-                    {
-                        errorHandler(exception);
-                    }
-                    catch (Exception handlerException)
-                    {
-                        UnityEngine.Debug.LogException(handlerException);
-                    }
-                }
-
-                return false;
-            }
-
-            return true;
-        }
-
         private void InternalInvoke(T arg, bool continueOnException)
         {
             if (this.head == null)
@@ -380,7 +297,7 @@ namespace AillieoUtils
     /// <typeparam name="T">Type of argument.</typeparam>
     public class Handle<T> : IEventHandle
     {
-        internal readonly Event<T> owner;
+        internal readonly EasyDelegate<T> owner;
 
         internal Action<T> callback;
 
@@ -388,7 +305,7 @@ namespace AillieoUtils
 
         internal Handle<T> previous;
 
-        internal Handle(Action<T> callback, Event<T> owner)
+        internal Handle(Action<T> callback, EasyDelegate<T> owner)
         {
             this.callback = callback;
             this.owner = owner;

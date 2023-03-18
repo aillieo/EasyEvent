@@ -1,5 +1,6 @@
 {
-    "name": "AillieoUtils.EasyEvents",
+    "name": "AillieoUtils.EasyEvent",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

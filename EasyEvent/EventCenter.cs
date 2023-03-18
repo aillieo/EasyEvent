@@ -14,9 +14,12 @@ namespace AillieoUtils
     /// </summary>
     public class EventCenter
     {
-        internal readonly Dictionary<string, Event<object>> mappings = new Dictionary<string, Event<object>>(StringComparer.Ordinal);
+        /// <summary>
+        /// Default <see cref="EventCenter"/> instance.
+        /// </summary>
+        public static readonly EventCenter Default = new EventCenter();
 
-        private static readonly EventCenter defaultInstance = new EventCenter();
+        private readonly Dictionary<string, EasyDelegate<object>> mappings = new Dictionary<string, EasyDelegate<object>>(StringComparer.Ordinal);
 
         /// <summary>
         /// Add listener to the named event.
@@ -24,9 +27,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> AddListener(string eventDef, Action callback)
+        public Handle<object> AddListener(string eventDef, Action callback)
         {
-            return defaultInstance.AddListener(eventDef, callback);
+            return this.GetEvent(eventDef, true).AddListener(_ => callback());
         }
 
         /// <summary>
@@ -35,9 +38,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> AddListener(string eventDef, Action<object> callback)
+        public Handle<object> AddListener(string eventDef, Action<object> callback)
         {
-            return defaultInstance.AddListener(eventDef, callback);
+            return this.GetEvent(eventDef, true).AddListener(callback);
         }
 
         /// <summary>
@@ -46,9 +49,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> ListenOnce(string eventDef, Action callback)
+        public Handle<object> ListenOnce(string eventDef, Action callback)
         {
-            return defaultInstance.ListenOnce(eventDef, callback);
+            return this.GetEvent(eventDef, true).ListenOnce(_ => callback());
         }
 
         /// <summary>
@@ -57,9 +60,9 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<object> ListenOnce(string eventDef, Action<object> callback)
+        public Handle<object> ListenOnce(string eventDef, Action<object> callback)
         {
-            return defaultInstance.ListenOnce(eventDef, callback);
+            return this.GetEvent(eventDef, true).ListenOnce(callback);
         }
 
         /// <summary>
@@ -68,9 +71,15 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="handle">Handle for the listener.</param>
         /// <returns>Remove succeed.</returns>
-        public static bool Remove(string eventDef, Handle<object> handle)
+        public bool Remove(string eventDef, Handle<object> handle)
         {
-            return defaultInstance.Remove(eventDef, handle);
+            EasyDelegate<object> evt = this.GetEvent(eventDef, false);
+            if (evt != null)
+            {
+                return evt.Remove(handle);
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -79,18 +88,24 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">The listener.</param>
         /// <returns>Count of removed listener instances.</returns>
-        public static int RemoveListener(string eventDef, Action<object> callback)
+        public int RemoveListener(string eventDef, Action<object> callback)
         {
-            return defaultInstance.RemoveListener(eventDef, callback);
+            EasyDelegate<object> evt = this.GetEvent(eventDef, false);
+            if (evt != null)
+            {
+                return evt.RemoveListener(callback);
+            }
+
+            return 0;
         }
 
         /// <summary>
         /// Remove all listeners registered.
         /// </summary>
         /// <param name="eventDef">Name of the event.</param>
-        public static void RemoveAllListeners(string eventDef)
+        public void RemoveAllListeners(string eventDef)
         {
-            defaultInstance.RemoveAllListeners(eventDef);
+            this.GetEvent(eventDef, false)?.RemoveAllListeners();
         }
 
         /// <summary>
@@ -98,9 +113,9 @@ namespace AillieoUtils
         /// </summary>
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="arg">Argument for event invoking.</param>
-        public static void Invoke(string eventDef, object arg = null)
+        public void Invoke(string eventDef, object arg = null)
         {
-            defaultInstance.Invoke(eventDef, arg);
+            this.GetEvent(eventDef, false)?.Invoke(arg);
         }
 
         /// <summary>
@@ -108,29 +123,34 @@ namespace AillieoUtils
         /// </summary>
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="arg">Argument for event invoking.</param>
-        public static void InvokeAll(string eventDef, object arg = null)
+        public void InvokeAll(string eventDef, object arg = null)
         {
-            defaultInstance.InvokeAll(eventDef, arg);
+            this.GetEvent(eventDef, false)?.InvokeAll(arg);
         }
 
         /// <summary>
         /// Remove all listeners registered to all events managed by <see cref="EventCenter"/>.
         /// </summary>
-        public static void Clear()
+        public void Clear()
         {
-            defaultInstance.Clear();
+            foreach (var pair in this.mappings)
+            {
+                pair.Value.RemoveAllListeners();
+            }
+
+            this.mappings.Clear();
         }
 
-        internal Event<object> GetEvent(string eventDef, bool createIfNotExist)
+        private EasyDelegate<object> GetEvent(string eventDef, bool createIfNotExist)
         {
             if (string.IsNullOrEmpty(eventDef))
             {
                 throw new ArgumentException($"Argument null or empty: {nameof(eventDef)}");
             }
 
-            if (!this.mappings.TryGetValue(eventDef, out Event<object> evt) && createIfNotExist)
+            if (!this.mappings.TryGetValue(eventDef, out EasyDelegate<object> evt) && createIfNotExist)
             {
-                evt = new Event<object>();
+                evt = new EasyDelegate<object>();
                 this.mappings.Add(eventDef, evt);
             }
 
