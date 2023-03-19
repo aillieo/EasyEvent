@@ -8,14 +8,12 @@ namespace AillieoUtils
 {
     using System;
 
-    public interface IListenable<T>
+    public interface IListenable<out T>
     {
-        Handle<T> AddListener(Action<T> callback);
+        EventHandle AddListener(Action<T> callback);
 
-        bool Remove(Handle<T> handle);
+        bool Remove(EventHandle handle);
 
         int RemoveListener(Action<T> callback);
-
-        void RemoveAllListeners();
     }
 }

@@ -19,7 +19,7 @@ namespace AillieoUtils
         /// <param name="listenable">The <see cref="IListenable"/> instance.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle ListenOnce(this IListenable listenable, Action callback)
+        public static EventHandle ListenOnce(this IListenable listenable, Action callback)
         {
             if (listenable == null)
             {
@@ -31,7 +31,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle handle = default;
+            EventHandle handle = default;
             handle = listenable.AddListener(() =>
             {
                 listenable.Remove(handle);
@@ -40,7 +40,7 @@ namespace AillieoUtils
             return handle;
         }
 
-        public static Handle ListenUntil(this IListenable listenable, Func<bool> callback)
+        public static EventHandle ListenUntil(this IListenable listenable, Func<bool> callback)
         {
             if (listenable == null)
             {
@@ -52,7 +52,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle handle = default;
+            EventHandle handle = default;
             handle = listenable.AddListener(() =>
             {
                 if (callback.Invoke())
@@ -70,7 +70,7 @@ namespace AillieoUtils
         /// <param name="listenable">The <see cref="IListenable{T}"/> instance.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public static Handle<T> ListenOnce<T>(this IListenable<T> listenable, Action<T> callback)
+        public static EventHandle ListenOnce<T>(this IListenable<T> listenable, Action<T> callback)
         {
             if (listenable == null)
             {
@@ -82,7 +82,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle<T> handle = default;
+            EventHandle handle = default;
             handle = listenable.AddListener(arg =>
             {
                 listenable.Remove(handle);
@@ -91,7 +91,7 @@ namespace AillieoUtils
             return handle;
         }
 
-        public static Handle<T> ListenUntil<T>(this IListenable<T> listenable, Func<T, bool> callback)
+        public static EventHandle ListenUntil<T>(this IListenable<T> listenable, Func<T, bool> callback)
         {
             if (listenable == null)
             {
@@ -103,7 +103,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle<T> handle = default;
+            EventHandle handle = default;
             handle = listenable.AddListener(arg =>
             {
                 if (callback.Invoke(arg))

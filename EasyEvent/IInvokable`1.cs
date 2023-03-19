@@ -6,10 +6,8 @@
 
 namespace AillieoUtils
 {
-    public interface IInvokable<T>
+    public interface IInvokable<in T>
     {
-        int ListenerCount { get; }
-
         void Invoke(T arg);
 
         void InvokeAll(T arg);

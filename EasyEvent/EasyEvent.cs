@@ -25,34 +25,16 @@ namespace AillieoUtils
         /// </summary>
         public bool Valid => this.associatedDelegate != null;
 
-        public Handle AddListener(Action callback)
+        public EventHandle AddListener(Action callback)
         {
             this.EnsureValid();
             return this.associatedDelegate.AddListener(callback);
         }
 
-        public Handle ListenOnce(Action callback)
+        public bool Remove(EventHandle eventHandle)
         {
             this.EnsureValid();
-            return this.associatedDelegate.ListenOnce(callback);
-        }
-
-        public Handle ListenUntil(Func<bool> callback)
-        {
-            this.EnsureValid();
-            return this.associatedDelegate.ListenUntil(callback);
-        }
-
-        public bool Remove(Handle handle)
-        {
-            this.EnsureValid();
-            return this.associatedDelegate.Remove(handle);
-        }
-
-        public void RemoveAllListeners()
-        {
-            this.EnsureValid();
-            this.associatedDelegate.RemoveAllListeners();
+            return this.associatedDelegate.Remove(eventHandle);
         }
 
         public int RemoveListener(Action callback)
