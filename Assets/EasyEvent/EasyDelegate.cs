@@ -33,7 +33,7 @@ namespace AillieoUtils
         /// </summary>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle AddListener(Action callback)
+        public EventHandle AddListener(Action callback)
         {
             if (callback == null)
             {
@@ -62,15 +62,21 @@ namespace AillieoUtils
         }
 
         /// <summary>
-        /// Remove a listener by handle.
+        /// Remove a listener by eventHandle.
         /// </summary>
-        /// <param name="handle">Handle for the listener.</param>
+        /// <param name="eventHandle">Handle for the listener.</param>
         /// <returns>Remove succeed.</returns>
-        public bool Remove(Handle handle)
+        public bool Remove(EventHandle eventHandle)
         {
+            if (eventHandle == null)
+            {
+                throw new ArgumentNullException(nameof(eventHandle));
+            }
+
+            Handle handle = eventHandle as Handle;
             if (handle == null)
             {
-                throw new ArgumentNullException(nameof(handle));
+                throw new InvalidOperationException($"Type not match: {eventHandle.GetType()} expected {typeof(Handle)}");
             }
 
             if (this.head == null)
@@ -93,12 +99,12 @@ namespace AillieoUtils
             if (this.lockCount == 0)
             {
                 // 需要考虑3种情况
-                if (handle.next == handle)
+                if (handle.next == eventHandle)
                 {
                     // 1. handle是唯一handle
                     this.head = null;
                 }
-                else if (this.head == handle)
+                else if (this.head == eventHandle)
                 {
                     // 2. handle是head
                     handle.next.previous = handle.previous;
@@ -286,36 +292,32 @@ namespace AillieoUtils
                 throw new AggregateException(exceptions);
             }
         }
-    }
 
-    /// <summary>
-    /// A Handle records a registration of a listener.
-    /// </summary>
-    public class Handle : IEventHandle
-    {
-        internal readonly EasyDelegate owner;
-
-        internal Action callback;
-
-        internal Handle next;
-
-        internal Handle previous;
-
-        internal Handle(Action callback, EasyDelegate owner)
+        internal class Handle : EventHandle
         {
-            this.callback = callback;
-            this.owner = owner;
-        }
+            internal readonly EasyDelegate owner;
 
-        /// <inheritdoc/>
-        public bool Unlisten()
-        {
-            if (this.callback != null)
+            internal Action callback;
+
+            internal Handle next;
+
+            internal Handle previous;
+
+            internal Handle(Action callback, EasyDelegate owner)
             {
-                return this.owner.Remove(this);
+                this.callback = callback;
+                this.owner = owner;
             }
 
-            return false;
+            public override bool Unlisten()
+            {
+                if (this.callback != null)
+                {
+                    return this.owner.Remove(this);
+                }
+
+                return false;
+            }
         }
     }
 }

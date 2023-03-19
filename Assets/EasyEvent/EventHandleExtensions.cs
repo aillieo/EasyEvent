@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="IEventHandleExtensions.cs" company="AillieoTech">
+// <copyright file="EventHandleExtensions.cs" company="AillieoTech">
 // Copyright (c) AillieoTech. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -7,16 +7,16 @@
 namespace AillieoUtils
 {
     /// <summary>
-    /// Extension methods for <see cref="IEventHandle"/>.
+    /// Extension methods for <see cref="EventHandle"/>.
     /// </summary>
-    public static class IEventHandleExtensions
+    public static class EventHandleExtensions
     {
         /// <summary>
-        /// Invoke <see cref="IEventHandle.Unlisten"/> with null check.
+        /// Invoke <see cref="EventHandle.Unlisten"/> with null check.
         /// </summary>
-        /// <param name="eventHandle">The <see cref="IEventHandle"/> instance.</param>
+        /// <param name="eventHandle">The <see cref="EventHandle"/> instance.</param>
         /// <returns>Remove succeed.</returns>
-        public static bool SafeUnlisten(this IEventHandle eventHandle)
+        public static bool SafeUnlisten(this EventHandle eventHandle)
         {
             if (eventHandle != null)
             {

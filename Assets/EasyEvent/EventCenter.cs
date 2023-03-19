@@ -27,7 +27,7 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle<object> AddListener(string eventDef, Action callback)
+        public EventHandle AddListener(string eventDef, Action callback)
         {
             return this.GetEvent(eventDef, true).AddListener(_ => callback());
         }
@@ -38,7 +38,7 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle<object> AddListener(string eventDef, Action<object> callback)
+        public EventHandle AddListener(string eventDef, Action<object> callback)
         {
             return this.GetEvent(eventDef, true).AddListener(callback);
         }
@@ -49,7 +49,7 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle<object> ListenOnce(string eventDef, Action callback)
+        public EventHandle ListenOnce(string eventDef, Action callback)
         {
             return this.GetEvent(eventDef, true).ListenOnce(_ => callback());
         }
@@ -60,9 +60,19 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle<object> ListenOnce(string eventDef, Action<object> callback)
+        public EventHandle ListenOnce(string eventDef, Action<object> callback)
         {
             return this.GetEvent(eventDef, true).ListenOnce(callback);
+        }
+
+        public EventHandle ListenUntil(string eventDef, Func<bool> callback)
+        {
+            return this.GetEvent(eventDef, true).ListenUntil(_ => callback());
+        }
+
+        public EventHandle ListenUntil(string eventDef, Func<object, bool> callback)
+        {
+            return this.GetEvent(eventDef, true).ListenUntil(callback);
         }
 
         /// <summary>
@@ -71,7 +81,7 @@ namespace AillieoUtils
         /// <param name="eventDef">Name of the event.</param>
         /// <param name="handle">Handle for the listener.</param>
         /// <returns>Remove succeed.</returns>
-        public bool Remove(string eventDef, Handle<object> handle)
+        public bool Remove(string eventDef, EventHandle handle)
         {
             EasyDelegate<object> evt = this.GetEvent(eventDef, false);
             if (evt != null)

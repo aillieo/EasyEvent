@@ -10,12 +10,10 @@ namespace AillieoUtils
 
     public interface IListenable
     {
-        Handle AddListener(Action callback);
+        EventHandle AddListener(Action callback);
 
-        bool Remove(Handle handle);
+        bool Remove(EventHandle eventHandle);
 
         int RemoveListener(Action callback);
-
-        void RemoveAllListeners();
     }
 }

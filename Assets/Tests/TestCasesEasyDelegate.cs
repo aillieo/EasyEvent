@@ -204,9 +204,9 @@ public class TestCasesEasyDelegate
 
         EasyDelegate evt2 = new EasyDelegate();
 
-        Handle handle1 = default;
+        EventHandle handle1 = default;
 
-        Handle handle2 = default;
+        EventHandle handle2 = default;
 
         handle1 = evt.AddListener(() =>
         {
@@ -337,7 +337,7 @@ public class TestCasesEasyDelegate
 
         EasyDelegate evt = new EasyDelegate();
 
-        Handle handle = null;
+        EventHandle handle = null;
         handle = evt.AddListener(() =>
         {
             counter++;
@@ -357,7 +357,7 @@ public class TestCasesEasyDelegate
         int count2 = 0;
         int count3 = 0;
         EasyDelegate evt = new EasyDelegate();
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(() =>
         {
             count1++;
@@ -398,7 +398,7 @@ public class TestCasesEasyDelegate
         this.memberCount = 0;
         int count2 = 0;
         EasyDelegate evt = new EasyDelegate();
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(this.CountAdd);
         evt.Invoke();
         var h2 = evt.AddListener(() =>
@@ -427,7 +427,7 @@ public class TestCasesEasyDelegate
         int count1 = 0;
         int count2 = 0;
         EasyDelegate evt = new EasyDelegate();
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(() =>
         {
             count1++;
@@ -466,7 +466,7 @@ public class TestCasesEasyDelegate
             count4++;
         });
 
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(() =>
         {
             count1++;
@@ -516,7 +516,7 @@ public class TestCasesEasyDelegate
             count4++;
         });
 
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(this.CountAdd);
         evt.Invoke();
 
@@ -555,7 +555,7 @@ public class TestCasesEasyDelegate
             count4++;
         });
 
-        Handle h1 = default;
+        EventHandle h1 = default;
         h1 = evt.AddListener(() =>
         {
             count1++;
@@ -592,7 +592,7 @@ public class TestCasesEasyDelegate
         int count2 = 0;
         int count3 = 0;
         EasyDelegate evt = new EasyDelegate();
-        Handle h3 = default;
+        EventHandle h3 = default;
         evt.AddListener(() =>
         {
             count1++;
@@ -663,7 +663,7 @@ public class TestCasesEasyDelegate
         int count2 = 0;
         int count3 = 0;
         EasyDelegate evt = new EasyDelegate();
-        Handle h3 = default;
+        EventHandle h3 = default;
         evt.AddListener(() =>
         {
             count1++;

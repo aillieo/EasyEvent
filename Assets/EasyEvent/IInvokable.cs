@@ -8,8 +8,6 @@ namespace AillieoUtils
 {
     public interface IInvokable
     {
-        int ListenerCount { get; }
-
         void Invoke();
 
         void InvokeAll();

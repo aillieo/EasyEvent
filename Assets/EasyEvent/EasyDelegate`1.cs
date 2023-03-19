@@ -17,7 +17,7 @@ namespace AillieoUtils
     {
         private int lockCount;
 
-        private Handle<T> head;
+        private Handle head;
 
         /// <summary>
         /// Gets the count of listeners currently registered to this event.
@@ -34,14 +34,14 @@ namespace AillieoUtils
         /// </summary>
         /// <param name="callback">Callback for this event.</param>
         /// <returns>Handle for this listener.</returns>
-        public Handle<T> AddListener(Action<T> callback)
+        public EventHandle AddListener(Action<T> callback)
         {
             if (callback == null)
             {
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            var newHandle = new Handle<T>(callback, this);
+            var newHandle = new Handle(callback, this);
 
             if (this.head == null)
             {
@@ -65,13 +65,19 @@ namespace AillieoUtils
         /// <summary>
         /// Remove a listener by handle.
         /// </summary>
-        /// <param name="handle">Handle for the listener.</param>
+        /// <param name="eventHandle">Handle for the listener.</param>
         /// <returns>Remove succeed.</returns>
-        public bool Remove(Handle<T> handle)
+        public bool Remove(EventHandle eventHandle)
         {
+            if (eventHandle == null)
+            {
+                throw new ArgumentNullException(nameof(eventHandle));
+            }
+
+            Handle handle = eventHandle as Handle;
             if (handle == null)
             {
-                throw new ArgumentNullException(nameof(handle));
+                throw new InvalidOperationException($"Type not match: {eventHandle.GetType()} expected {typeof(Handle)}");
             }
 
             if (this.head == null)
@@ -133,7 +139,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(callback));
             }
 
-            Handle<T> handle = this.head;
+            Handle handle = this.head;
             var oldListenerCount = this.ListenerCount;
 
             if (handle != null)
@@ -163,7 +169,7 @@ namespace AillieoUtils
         /// </summary>
         public void RemoveAllListeners()
         {
-            Handle<T> handle = this.head;
+            Handle handle = this.head;
 
             if (handle != null)
             {
@@ -209,7 +215,7 @@ namespace AillieoUtils
             List<Exception> exceptions = null;
 
             this.lockCount++;
-            Handle<T> handle = this.head;
+            Handle handle = this.head;
             while (true)
             {
                 if (handle.callback != null)
@@ -269,7 +275,7 @@ namespace AillieoUtils
                             // 3. 其它情况
                             handle.next.previous = handle.previous;
                             handle.previous.next = handle.next;
-                            Handle<T> next = handle.next;
+                            Handle next = handle.next;
                             handle.next = null;
                             handle.previous = null;
                             handle = next;
@@ -289,37 +295,32 @@ namespace AillieoUtils
                 throw new AggregateException(exceptions);
             }
         }
-    }
 
-    /// <summary>
-    /// A Handle records a registration of a listener.
-    /// </summary>
-    /// <typeparam name="T">Type of argument.</typeparam>
-    public class Handle<T> : IEventHandle
-    {
-        internal readonly EasyDelegate<T> owner;
-
-        internal Action<T> callback;
-
-        internal Handle<T> next;
-
-        internal Handle<T> previous;
-
-        internal Handle(Action<T> callback, EasyDelegate<T> owner)
+        internal class Handle : EventHandle
         {
-            this.callback = callback;
-            this.owner = owner;
-        }
+            internal readonly EasyDelegate<T> owner;
 
-        /// <inheritdoc/>
-        public bool Unlisten()
-        {
-            if (this.callback != null)
+            internal Action<T> callback;
+
+            internal Handle next;
+
+            internal Handle previous;
+
+            internal Handle(Action<T> callback, EasyDelegate<T> owner)
             {
-                return this.owner.Remove(this);
+                this.callback = callback;
+                this.owner = owner;
             }
 
-            return false;
+            public override bool Unlisten()
+            {
+                if (this.callback != null)
+                {
+                    return this.owner.Remove(this);
+                }
+
+                return false;
+            }
         }
     }
 }
