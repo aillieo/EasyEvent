@@ -1,131 +1,177 @@
-using System;
-using AillieoUtils;
-using NUnit.Framework;
-using UnityEngine.Events;
+// -----------------------------------------------------------------------
+// <copyright file="Performance.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
-[Category("PerformanceTest")]
-public class Performance
+namespace AillieoUtils.EasyEventTests
 {
-    [Test, Order(100)]
-    public static void TestBatch()
+    using System;
+    using AillieoUtils;
+    using NUnit.Framework;
+    using UnityEngine.Events;
+    using UnityEngine.Profiling;
+
+    [Category("PerformanceTest")]
+    public class Performance
     {
-        for (int i = 0; i < 100; ++i)
+        private readonly EasyDelegate event1 = new EasyDelegate();
+        private readonly UnityEvent event2 = new UnityEvent();
+
+        private event Action event3;
+
+        private readonly int loopCount = 100;
+
+        private int counter = 0;
+        private int result;
+
+        private Action callback;
+        private UnityAction unityCallback;
+
+        [Test]
+        [Order(100)]
+        public static void TestBatch()
         {
-            Performance performance = new Performance();
+            for (var i = 0; i < 100; ++i)
+            {
+                var performance = new Performance();
 
-            performance.RegisterEasyEvent();
-            performance.RunEasyEvent();
-            performance.UnregisterEasyEvent();
+                Profiler.BeginSample("Perf-RegisterEasyEvent");
+                performance.RegisterEasyEvent();
+                Profiler.EndSample();
 
-            performance.RegisterUnityEvent();
-            performance.RunUnityEvent();
-            performance.UnregisterUnityEvent();
+                Profiler.BeginSample("Perf-RunEasyEvent");
+                performance.RunEasyEvent();
+                Profiler.EndSample();
 
-            performance.RegisterCSEvent();
-            performance.RunCSEvent();
-            performance.UnregisterCSEvent();
-        }
-    }
+                Profiler.BeginSample("Perf-UnregisterEasyEvent");
+                performance.UnregisterEasyEvent();
+                Profiler.EndSample();
 
-    private EasyDelegate event1 = new EasyDelegate();
-    private UnityEngine.Events.UnityEvent event2 = new UnityEngine.Events.UnityEvent();
-    private event Action event3;
+                Profiler.BeginSample("Perf-RegisterUnityEvent");
+                performance.RegisterUnityEvent();
+                Profiler.EndSample();
 
-    private int loopCount = 100;
+                Profiler.BeginSample("Perf-RunUnityEvent");
+                performance.RunUnityEvent();
+                Profiler.EndSample();
 
-    private int counter = 0;
-    private Action callback;
-    private UnityAction unityCallback;
-    private int result;
+                Profiler.BeginSample("Perf-UnregisterUnityEvent");
+                performance.UnregisterUnityEvent();
+                Profiler.EndSample();
 
-    public Performance()
-    {
-        callback = () => counter++;
-        unityCallback = () => counter++;
-    }
+                Profiler.BeginSample("Perf-RegisterCSEvent");
+                performance.RegisterCSEvent();
+                Profiler.EndSample();
 
-    [Test, Order(1)]
-    public void RegisterEasyEvent()
-    {
-        for (int i = 0; i < loopCount; i++)
-        {
-            event1.AddListener(callback);
-        }
-    }
+                Profiler.BeginSample("Perf-RunCSEvent");
+                performance.RunCSEvent();
+                Profiler.EndSample();
 
-    [Test, Order(2)]
-    public void RunEasyEvent()
-    {
-        counter = 0;
-        for (int i = 0; i < loopCount; i ++)
-        {
-            event1.Invoke();
-        }
-
-        result = counter;
-    }
-
-    [Test, Order(3)]
-    public void UnregisterEasyEvent()
-    {
-        event1.RemoveAllListeners();
-    }
-
-    [Test, Order(1)]
-    public void RegisterUnityEvent()
-    {
-        for (int i = 0; i < loopCount; i++)
-        {
-            event2.AddListener(unityCallback);
-        }
-    }
-
-    [Test, Order(2)]
-    public void RunUnityEvent()
-    {
-        counter = 0;
-        for (int i = 0; i < loopCount; i++)
-        {
-            event2.Invoke();
+                Profiler.BeginSample("Perf-UnregisterCSEvent");
+                performance.UnregisterCSEvent();
+                Profiler.EndSample();
+            }
         }
 
-        result = counter;
-    }
-
-    [Test, Order(3)]
-    public void UnregisterUnityEvent()
-    {
-        event2.RemoveAllListeners();
-    }
-
-    [Test, Order(1)]
-    public void RegisterCSEvent()
-    {
-        for (int i = 0; i < loopCount; i++)
+        public Performance()
         {
-            event3 += callback;
-        }
-    }
-
-    [Test, Order(2)]
-    public void RunCSEvent()
-    {
-        counter = 0;
-        for (int i = 0; i < loopCount; i++)
-        {
-            event3.Invoke();
+            this.callback = () => this.counter++;
+            this.unityCallback = () => this.counter++;
         }
 
-        result = counter;
-    }
-
-    [Test, Order(3)]
-    public void UnregisterCSEvent()
-    {
-        var list = event3.GetInvocationList();
-        foreach (var e in list)
+        [Test]
+        [Order(1)]
+        public void RegisterEasyEvent()
         {
-            event3 -= (Action)e;
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event1.AddListener(this.callback);
+            }
+        }
+
+        [Test]
+        [Order(2)]
+        public void RunEasyEvent()
+        {
+            this.counter = 0;
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event1.Invoke();
+            }
+
+            this.result = this.counter;
+        }
+
+        [Test]
+        [Order(3)]
+        public void UnregisterEasyEvent()
+        {
+            this.event1.RemoveAllListeners();
+        }
+
+        [Test]
+        [Order(1)]
+        public void RegisterUnityEvent()
+        {
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event2.AddListener(this.unityCallback);
+            }
+        }
+
+        [Test]
+        [Order(2)]
+        public void RunUnityEvent()
+        {
+            this.counter = 0;
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event2.Invoke();
+            }
+
+            this.result = this.counter;
+        }
+
+        [Test]
+        [Order(3)]
+        public void UnregisterUnityEvent()
+        {
+            this.event2.RemoveAllListeners();
+        }
+
+        [Test]
+        [Order(1)]
+        public void RegisterCSEvent()
+        {
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event3 += this.callback;
+            }
+        }
+
+        [Test]
+        [Order(2)]
+        public void RunCSEvent()
+        {
+            this.counter = 0;
+            for (var i = 0; i < this.loopCount; i++)
+            {
+                this.event3.Invoke();
+            }
+
+            this.result = this.counter;
+        }
+
+        [Test]
+        [Order(3)]
+        public void UnregisterCSEvent()
+        {
+            var list = this.event3.GetInvocationList();
+            foreach (var e in list)
+            {
+                this.event3 -= (Action)e;
+            }
         }
     }
 }

@@ -1,715 +1,724 @@
-using System;
-using AillieoUtils;
-using NUnit.Framework;
+// -----------------------------------------------------------------------
+// <copyright file="TestCasesEasyDelegate.cs" company="AillieoTech">
+// Copyright (c) AillieoTech. All rights reserved.
+// </copyright>
+// -----------------------------------------------------------------------
 
-[Category("DelegateTest")]
-public class TestCasesEasyDelegate
+namespace AillieoUtils.EasyEventTests
 {
-    private int memberCount = 0;
+    using System;
+    using AillieoUtils;
+    using NUnit.Framework;
 
-    private void CountAdd()
+    [Category("DelegateTest")]
+    public class TestCasesEasyDelegate
     {
-        this.memberCount++;
-    }
+        private int memberCount = 0;
 
-    [Test]
-    public void TestRemoveAll()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-        evt.AddListener(() =>
+        private void CountAdd()
         {
-            count1++;
-        });
-        evt.AddListener(() =>
-        {
-            count2++;
-        });
-        evt.Invoke();
+            this.memberCount++;
+        }
 
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 1);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 0);
-
-        evt.AddListener(() =>
+        [Test]
+        public void TestRemoveAll()
         {
-            count1++;
-            evt.RemoveAllListeners();
-            count3++;
+            var count1 = 0;
+            var count2 = 0;
+            var count3 = 0;
+
+            var evt = new EasyDelegate();
+            evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.AddListener(() =>
+            {
+                count2++;
+            });
+            evt.Invoke();
+
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 1);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 0);
+
+            evt.AddListener(() =>
+            {
+                count1++;
+                evt.RemoveAllListeners();
+                count3++;
+
+                evt.AddListener(() =>
+                {
+                    count3++;
+                });
+            });
+
+            Assert.AreEqual(evt.ListenerCount, 3);
+            Assert.AreEqual(count1, 1);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 0);
+
+            evt.Invoke();
+
+            Assert.AreEqual(evt.ListenerCount, 1);
+
+            Assert.AreEqual(count1, 3);
+            Assert.AreEqual(count2, 2);
+            Assert.AreEqual(count3, 2);
+
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(count1, 3);
+            Assert.AreEqual(count2, 2);
+
+            Assert.AreEqual(count3, 3);
+        }
+
+        [Test]
+        public void TestRemoveOnlyAndAdd()
+        {
+            var evt = new EasyDelegate();
+            var count = 0;
+
+            var h1 = evt.AddListener(() =>
+            {
+                count++;
+            });
+
+            evt.Invoke();
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(evt.ListenerCount, 1);
+
+            evt.Remove(h1);
+            Assert.AreEqual(evt.ListenerCount, 0);
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 0);
+            Assert.AreEqual(count, 1);
+            evt.AddListener(() =>
+            {
+                count++;
+            });
+            Assert.AreEqual(evt.ListenerCount, 1);
+            evt.Invoke();
+            Assert.AreEqual(count, 2);
+        }
+
+        [Test]
+        public void TestRemoveOnlyByFunc()
+        {
+            this.memberCount = 0;
+            var evt = new EasyDelegate();
+
+            evt.AddListener(this.CountAdd);
+
+            evt.Invoke();
+            Assert.AreEqual(this.memberCount, 1);
+            Assert.AreEqual(evt.ListenerCount, 1);
+
+            evt.RemoveListener(this.CountAdd);
+            Assert.AreEqual(evt.ListenerCount, 0);
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 0);
+            Assert.AreEqual(this.memberCount, 1);
+        }
+
+        [Test]
+        public void TestRemoveOnly()
+        {
+            var evt = new EasyDelegate();
+            var count = 0;
+
+            var h1 = evt.AddListener(() =>
+            {
+                count++;
+            });
+
+            evt.Invoke();
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(evt.ListenerCount, 1);
+
+            evt.Remove(h1);
+            Assert.AreEqual(evt.ListenerCount, 0);
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 0);
+            Assert.AreEqual(count, 1);
+        }
+
+        [Test]
+        public void TestInvoke()
+        {
+            var evt = new EasyDelegate();
+            var count = 0;
+
+            var h1 = evt.AddListener(() =>
+            {
+                count++;
+            });
+
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(count, 2);
+        }
+
+        [Test]
+        public void TestInvokeTwice()
+        {
+            var evt = new EasyDelegate();
+
+            var count = 0;
+            evt.AddListener(() =>
+            {
+                count++;
+            });
+
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(count, 2);
+        }
+
+        [Test]
+        public void TestUnlisten()
+        {
+            var evt = new EasyDelegate();
+            var count = 0;
+
+            var h1 = evt.AddListener(() =>
+            {
+                count++;
+            });
+
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+
+            h1.Unlisten();
+
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+        }
+
+        [Test]
+        public void TestAddRemove2()
+        {
+            var count = 0;
+            this.memberCount = 0;
+
+            var evt = new EasyDelegate();
+
+            var evt2 = new EasyDelegate();
+
+            EventHandle handle1 = default;
+
+            EventHandle handle2 = default;
+
+            handle1 = evt.AddListener(() =>
+            {
+                count++;
+                evt.Remove(handle1);
+            });
+
+            handle2 = evt2.AddListener(() => throw new NotImplementedException());
+
+            evt.Remove(handle2);
+
+            evt.AddListener(() => { });
+
+            evt.AddListener(this.CountAdd);
+            evt.AddListener(this.CountAdd);
+
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(this.memberCount, 2);
+
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(this.memberCount, 4);
+
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(this.memberCount, 6);
+
+            var rmvCount = evt.RemoveListener(this.CountAdd);
+            Assert.AreEqual(rmvCount, 2);
+
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(this.memberCount, 6);
+
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(count, 1);
+            Assert.AreEqual(this.memberCount, 6);
+        }
+
+        [Test]
+        public void TestEmptyInvoke()
+        {
+            var evt = new EasyDelegate();
+            evt.Invoke();
+        }
+
+        [Test]
+        public void TestInvoke2()
+        {
+            var counter1 = 0;
+            var counter2 = 0;
+
+            var evt = new EasyDelegate();
+            evt.AddListener(() =>
+            {
+                counter1++;
+            });
+            evt.Invoke();
+
+            evt.AddListener(() =>
+            {
+                counter2++;
+            });
+            evt.Invoke();
+
+            Assert.AreEqual(2, counter1);
+            Assert.AreEqual(1, counter2);
+        }
+
+        [Test]
+        public void TestAddRemove()
+        {
+            var counter1 = 0;
+            var counter2 = 0;
+
+            var evt = new EasyDelegate();
+            var handle1 = evt.AddListener(() =>
+            {
+                counter1++;
+            });
+            evt.Invoke();
+
+            var handle2 = evt.AddListener(() =>
+            {
+                counter2++;
+            });
+            evt.Remove(handle1);
+            evt.Invoke();
+
+            evt.Remove(handle2);
+            evt.Invoke();
+
+            Assert.AreEqual(1, counter1);
+            Assert.AreEqual(1, counter2);
+        }
+
+        [Test]
+        public void TestNestAdd()
+        {
+            var counter1 = 0;
+            var counter2 = 0;
+
+            var evt = new EasyDelegate();
+            evt.AddListener(() =>
+            {
+                counter1++;
+                evt.AddListener(() =>
+                {
+                    counter2++;
+                });
+            });
+
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(1, counter1);
+            Assert.AreEqual(1, counter2);
+        }
+
+        [Test]
+        public void TestListenOnce()
+        {
+            var counter = 0;
+
+            var evt = new EasyDelegate();
+
+            EventHandle handle = null;
+            handle = evt.AddListener(() =>
+            {
+                counter++;
+                evt.Remove(handle);
+            });
+
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(1, counter);
+        }
+
+        [Test]
+        public void TestRemoveHeadAndAdd()
+        {
+            var count1 = 0;
+            var count2 = 0;
+            var count3 = 0;
+            var evt = new EasyDelegate();
+            EventHandle h1 = default;
+            h1 = evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h1);
+            });
+
+            Assert.AreEqual(evt.ListenerCount, 2);
 
             evt.AddListener(() =>
             {
                 count3++;
             });
-        });
 
-        Assert.AreEqual(evt.ListenerCount, 3);
-        Assert.AreEqual(count1, 1);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 0);
+            Assert.AreEqual(evt.ListenerCount, 3);
 
-        evt.Invoke();
+            evt.Invoke();
 
-        Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 1);
 
-        Assert.AreEqual(count1, 3);
-        Assert.AreEqual(count2, 2);
-        Assert.AreEqual(count3, 2);
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 2);
+            Assert.AreEqual(count3, 2);
+        }
 
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(count1, 3);
-        Assert.AreEqual(count2, 2);
-
-        Assert.AreEqual(count3, 3);
-    }
-
-    [Test]
-    public void TestRemoveOnlyAndAdd()
-    {
-        EasyDelegate evt = new EasyDelegate();
-        int count = 0;
-
-        var h1 = evt.AddListener(() =>
+        [Test]
+        public void TestRemoveHeadByFunc()
         {
-            count++;
-        });
+            this.memberCount = 0;
+            var count2 = 0;
+            var evt = new EasyDelegate();
+            EventHandle h1 = default;
+            h1 = evt.AddListener(this.CountAdd);
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.RemoveListener(this.CountAdd);
+            });
 
-        evt.Invoke();
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(evt.ListenerCount, 2);
 
-        evt.Remove(h1);
-        Assert.AreEqual(evt.ListenerCount, 0);
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 0);
-        Assert.AreEqual(count, 1);
-        evt.AddListener(() =>
+            evt.Invoke();
+
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(this.memberCount, 2);
+            Assert.AreEqual(count2, 1);
+
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(this.memberCount, 2);
+            Assert.AreEqual(count2, 2);
+        }
+
+        [Test]
+        public void TestRemoveHead()
         {
-            count++;
-        });
-        Assert.AreEqual(evt.ListenerCount, 1);
-        evt.Invoke();
-        Assert.AreEqual(count, 2);
-    }
+            var count1 = 0;
+            var count2 = 0;
+            var evt = new EasyDelegate();
+            EventHandle h1 = default;
+            h1 = evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h1);
+            });
 
-    [Test]
-    public void TestRemoveOnlyByFunc()
-    {
-        this.memberCount = 0;
-        EasyDelegate evt = new EasyDelegate();
+            Assert.AreEqual(evt.ListenerCount, 2);
 
-        evt.AddListener(this.CountAdd);
+            evt.Invoke();
 
-        evt.Invoke();
-        Assert.AreEqual(this.memberCount, 1);
-        Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
 
-        evt.RemoveListener(this.CountAdd);
-        Assert.AreEqual(evt.ListenerCount, 0);
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 0);
-        Assert.AreEqual(this.memberCount, 1);
-    }
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 2);
+        }
 
-    [Test]
-    public void TestRemoveOnly()
-    {
-        EasyDelegate evt = new EasyDelegate();
-        int count = 0;
-
-        var h1 = evt.AddListener(() =>
+        [Test]
+        public void TestRemoveMiddleAndAdd()
         {
-            count++;
-        });
-
-        evt.Invoke();
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(evt.ListenerCount, 1);
-
-        evt.Remove(h1);
-        Assert.AreEqual(evt.ListenerCount, 0);
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 0);
-        Assert.AreEqual(count, 1);
-    }
-
-    [Test]
-    public void TestInvoke()
-    {
-        EasyDelegate evt = new EasyDelegate();
-        int count = 0;
-
-        var h1 = evt.AddListener(() =>
-        {
-            count++;
-        });
-
-        evt.Invoke();
-        evt.Invoke();
-
-        Assert.AreEqual(count, 2);
-    }
-
-    [Test]
-    public void TestInvokeTwice()
-    {
-        EasyDelegate evt = new EasyDelegate();
-
-        int count = 0;
-        evt.AddListener(() =>
-        {
-            count++;
-        });
-
-        evt.Invoke();
-        evt.Invoke();
-
-        Assert.AreEqual(count, 2);
-    }
-
-    [Test]
-    public void TestUnlisten()
-    {
-        EasyDelegate evt = new EasyDelegate();
-        int count = 0;
-
-        var h1 = evt.AddListener(() =>
-        {
-            count++;
-        });
-
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-
-        h1.Unlisten();
-
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-    }
-
-    [Test]
-    public void TestAddRemove2()
-    {
-        int count = 0;
-        this.memberCount = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-
-        EasyDelegate evt2 = new EasyDelegate();
-
-        EventHandle handle1 = default;
-
-        EventHandle handle2 = default;
-
-        handle1 = evt.AddListener(() =>
-        {
-            count++;
-            evt.Remove(handle1);
-        });
-
-        handle2 = evt2.AddListener(() => throw new NotImplementedException());
-
-        evt.Remove(handle2);
-
-        evt.AddListener(() => { });
-
-        evt.AddListener(this.CountAdd);
-        evt.AddListener(this.CountAdd);
-
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(this.memberCount, 2);
-
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(this.memberCount, 4);
-
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(this.memberCount, 6);
-
-        int rmvCount = evt.RemoveListener(this.CountAdd);
-        Assert.AreEqual(rmvCount, 2);
-
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(this.memberCount, 6);
-
-        evt.Invoke();
-        evt.Invoke();
-
-        Assert.AreEqual(count, 1);
-        Assert.AreEqual(this.memberCount, 6);
-    }
-
-    [Test]
-    public void TestEmptyInvoke()
-    {
-        EasyDelegate evt = new EasyDelegate();
-        evt.Invoke();
-    }
-
-    [Test]
-    public void TestInvoke2()
-    {
-        int counter1 = 0;
-        int counter2 = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-        evt.AddListener(() =>
-        {
-            counter1++;
-        });
-        evt.Invoke();
-
-        evt.AddListener(() =>
-        {
-            counter2++;
-        });
-        evt.Invoke();
-
-        Assert.AreEqual(2, counter1);
-        Assert.AreEqual(1, counter2);
-    }
-
-    [Test]
-    public void TestAddRemove()
-    {
-        int counter1 = 0;
-        int counter2 = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-        var handle1 = evt.AddListener(() =>
-        {
-            counter1++;
-        });
-        evt.Invoke();
-
-        var handle2 = evt.AddListener(() =>
-        {
-            counter2++;
-        });
-        evt.Remove(handle1);
-        evt.Invoke();
-
-        evt.Remove(handle2);
-        evt.Invoke();
-
-        Assert.AreEqual(1, counter1);
-        Assert.AreEqual(1, counter2);
-    }
-
-    [Test]
-    public void TestNestAdd()
-    {
-        int counter1 = 0;
-        int counter2 = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-        evt.AddListener(() =>
-        {
-            counter1++;
+            var count1 = 0;
+            var count2 = 0;
+            var count3 = 0;
+            var evt = new EasyDelegate();
+            var count4 = 0;
             evt.AddListener(() =>
             {
-                counter2++;
+                count4++;
             });
-        });
 
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(1, counter1);
-        Assert.AreEqual(1, counter2);
-    }
+            EventHandle h1 = default;
+            h1 = evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h1);
+            });
 
-    [Test]
-    public void TestListenOnce()
-    {
-        int counter = 0;
+            Assert.AreEqual(evt.ListenerCount, 3);
+            Assert.AreEqual(count4, 1);
 
-        EasyDelegate evt = new EasyDelegate();
+            evt.AddListener(() =>
+            {
+                count3++;
+            });
 
-        EventHandle handle = null;
-        handle = evt.AddListener(() =>
+            Assert.AreEqual(evt.ListenerCount, 4);
+
+            evt.Invoke();
+
+            Assert.AreEqual(count4, 2);
+            Assert.AreEqual(evt.ListenerCount, 3);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 1);
+
+            evt.Invoke();
+            Assert.AreEqual(count4, 3);
+            Assert.AreEqual(evt.ListenerCount, 3);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 2);
+            Assert.AreEqual(count3, 2);
+        }
+
+        [Test]
+        public void TestRemoveMiddleByFunc()
         {
-            counter++;
-            evt.Remove(handle);
-        });
+            this.memberCount = 0;
+            var count2 = 0;
+            var evt = new EasyDelegate();
+            var count4 = 0;
+            evt.AddListener(() =>
+            {
+                count4++;
+            });
 
-        evt.Invoke();
-        evt.Invoke();
+            EventHandle h1 = default;
+            h1 = evt.AddListener(this.CountAdd);
+            evt.Invoke();
 
-        Assert.AreEqual(1, counter);
-    }
+            Assert.AreEqual(count4, 1);
 
-    [Test]
-    public void TestRemoveHeadAndAdd()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        EventHandle h1 = default;
-        h1 = evt.AddListener(() =>
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.RemoveListener(this.CountAdd);
+            });
+
+            Assert.AreEqual(evt.ListenerCount, 3);
+
+            evt.Invoke();
+            Assert.AreEqual(count4, 2);
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(this.memberCount, 2);
+            Assert.AreEqual(count2, 1);
+
+            evt.Invoke();
+            Assert.AreEqual(count4, 3);
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(this.memberCount, 2);
+            Assert.AreEqual(count2, 2);
+        }
+
+        [Test]
+        public void TestRemoveMiddle()
         {
-            count1++;
-        });
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
+            var count1 = 0;
+            var count2 = 0;
+            var evt = new EasyDelegate();
+            var count4 = 0;
+            evt.AddListener(() =>
+            {
+                count4++;
+            });
+
+            EventHandle h1 = default;
+            h1 = evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+
+            Assert.AreEqual(count4, 1);
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h1);
+            });
+
+            Assert.AreEqual(evt.ListenerCount, 3);
+
+            evt.Invoke();
+
+            Assert.AreEqual(count4, 2);
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
+
+            evt.Invoke();
+            Assert.AreEqual(count4, 3);
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 2);
+        }
+
+        [Test]
+        public void TestRemoveTailAndAdd()
         {
-            count2++;
-            evt.Remove(h1);
-        });
+            var count1 = 0;
+            var count2 = 0;
+            var count3 = 0;
+            var evt = new EasyDelegate();
+            EventHandle h3 = default;
+            evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h3);
+            });
 
-        Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(evt.ListenerCount, 2);
 
-        evt.AddListener(() =>
+            h3 = evt.AddListener(() =>
+            {
+                count3++;
+            });
+
+            Assert.AreEqual(evt.ListenerCount, 3);
+
+            evt.Invoke();
+
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 0);
+
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 3);
+            Assert.AreEqual(count2, 2);
+            Assert.AreEqual(count3, 0);
+        }
+
+        [Test]
+        public void TestRemoveTailByFunc()
         {
-            count3++;
-        });
+            this.memberCount = 0;
+            var count2 = 0;
+            var evt = new EasyDelegate();
+            evt.Invoke();
 
-        Assert.AreEqual(evt.ListenerCount, 3);
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.RemoveListener(this.CountAdd);
+            });
+            evt.AddListener(this.CountAdd);
 
-        evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 2);
 
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 1);
+            evt.Invoke();
 
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 2);
-        Assert.AreEqual(count3, 2);
-    }
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(this.memberCount, 0);
+            Assert.AreEqual(count2, 1);
 
-    [Test]
-    public void TestRemoveHeadByFunc()
-    {
-        this.memberCount = 0;
-        int count2 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        EventHandle h1 = default;
-        h1 = evt.AddListener(this.CountAdd);
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 1);
+            Assert.AreEqual(this.memberCount, 0);
+            Assert.AreEqual(count2, 2);
+        }
+
+        [Test]
+        public void TestRemoveTail()
         {
-            count2++;
-            evt.RemoveListener(this.CountAdd);
-        });
+            var count1 = 0;
+            var count2 = 0;
+            var count3 = 0;
+            var evt = new EasyDelegate();
+            EventHandle h3 = default;
+            evt.AddListener(() =>
+            {
+                count1++;
+            });
+            evt.Invoke();
+            var h2 = evt.AddListener(() =>
+            {
+                count2++;
+                evt.Remove(h3);
+            });
 
-        Assert.AreEqual(evt.ListenerCount, 2);
+            h3 = evt.AddListener(() =>
+            {
+                count3++;
+            });
 
-        evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 3);
 
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(this.memberCount, 2);
-        Assert.AreEqual(count2, 1);
+            evt.Invoke();
 
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(this.memberCount, 2);
-        Assert.AreEqual(count2, 2);
-    }
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 2);
+            Assert.AreEqual(count2, 1);
+            Assert.AreEqual(count3, 0);
 
-    [Test]
-    public void TestRemoveHead()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        EventHandle h1 = default;
-        h1 = evt.AddListener(() =>
+            evt.Invoke();
+            Assert.AreEqual(evt.ListenerCount, 2);
+            Assert.AreEqual(count1, 3);
+            Assert.AreEqual(count2, 2);
+            Assert.AreEqual(count3, 0);
+        }
+
+        [Test]
+        public void TestWithExceptions()
         {
-            count1++;
-        });
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.Remove(h1);
-        });
+            var count0 = 0;
 
-        Assert.AreEqual(evt.ListenerCount, 2);
+            var evt = new EasyDelegate();
+            evt.AddListener(() => throw new InvalidOperationException());
+            evt.AddListener(() => count0++);
+            evt.AddListener(() => throw new InvalidOperationException());
 
-        evt.Invoke();
+            Assert.Throws<InvalidOperationException>(() => evt.Invoke());
+            Assert.AreEqual(count0, 0);
 
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 2);
-    }
-
-    [Test]
-    public void TestRemoveMiddleAndAdd()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        int count4 = 0;
-        evt.AddListener(() =>
-        {
-            count4++;
-        });
-
-        EventHandle h1 = default;
-        h1 = evt.AddListener(() =>
-        {
-            count1++;
-        });
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.Remove(h1);
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 3);
-        Assert.AreEqual(count4, 1);
-
-        evt.AddListener(() =>
-        {
-            count3++;
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 4);
-
-        evt.Invoke();
-
-        Assert.AreEqual(count4, 2);
-        Assert.AreEqual(evt.ListenerCount, 3);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 1);
-
-        evt.Invoke();
-        Assert.AreEqual(count4, 3);
-        Assert.AreEqual(evt.ListenerCount, 3);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 2);
-        Assert.AreEqual(count3, 2);
-    }
-
-    [Test]
-    public void TestRemoveMiddleByFunc()
-    {
-        this.memberCount = 0;
-        int count2 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        int count4 = 0;
-        evt.AddListener(() =>
-        {
-            count4++;
-        });
-
-        EventHandle h1 = default;
-        h1 = evt.AddListener(this.CountAdd);
-        evt.Invoke();
-
-        Assert.AreEqual(count4, 1);
-
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.RemoveListener(this.CountAdd);
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 3);
-
-        evt.Invoke();
-        Assert.AreEqual(count4, 2);
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(this.memberCount, 2);
-        Assert.AreEqual(count2, 1);
-
-        evt.Invoke();
-        Assert.AreEqual(count4, 3);
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(this.memberCount, 2);
-        Assert.AreEqual(count2, 2);
-    }
-
-    [Test]
-    public void TestRemoveMiddle()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        int count4 = 0;
-        evt.AddListener(() =>
-        {
-            count4++;
-        });
-
-        EventHandle h1 = default;
-        h1 = evt.AddListener(() =>
-        {
-            count1++;
-        });
-        evt.Invoke();
-
-        Assert.AreEqual(count4, 1);
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.Remove(h1);
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 3);
-
-        evt.Invoke();
-
-        Assert.AreEqual(count4, 2);
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-
-        evt.Invoke();
-        Assert.AreEqual(count4, 3);
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 2);
-    }
-
-    [Test]
-    public void TestRemoveTailAndAdd()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        EventHandle h3 = default;
-        evt.AddListener(() =>
-        {
-            count1++;
-        });
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.Remove(h3);
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 2);
-
-        h3 = evt.AddListener(() =>
-        {
-            count3++;
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 3);
-
-        evt.Invoke();
-
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 0);
-
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 3);
-        Assert.AreEqual(count2, 2);
-        Assert.AreEqual(count3, 0);
-    }
-
-    [Test]
-    public void TestRemoveTailByFunc()
-    {
-        this.memberCount = 0;
-        int count2 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        evt.Invoke();
-
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.RemoveListener(this.CountAdd);
-        });
-        evt.AddListener(this.CountAdd);
-
-        Assert.AreEqual(evt.ListenerCount, 2);
-
-        evt.Invoke();
-
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(this.memberCount, 0);
-        Assert.AreEqual(count2, 1);
-
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 1);
-        Assert.AreEqual(this.memberCount, 0);
-        Assert.AreEqual(count2, 2);
-    }
-
-    [Test]
-    public void TestRemoveTail()
-    {
-        int count1 = 0;
-        int count2 = 0;
-        int count3 = 0;
-        EasyDelegate evt = new EasyDelegate();
-        EventHandle h3 = default;
-        evt.AddListener(() =>
-        {
-            count1++;
-        });
-        evt.Invoke();
-        var h2 = evt.AddListener(() =>
-        {
-            count2++;
-            evt.Remove(h3);
-        });
-
-        h3 = evt.AddListener(() =>
-        {
-            count3++;
-        });
-
-        Assert.AreEqual(evt.ListenerCount, 3);
-
-        evt.Invoke();
-
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 2);
-        Assert.AreEqual(count2, 1);
-        Assert.AreEqual(count3, 0);
-
-        evt.Invoke();
-        Assert.AreEqual(evt.ListenerCount, 2);
-        Assert.AreEqual(count1, 3);
-        Assert.AreEqual(count2, 2);
-        Assert.AreEqual(count3, 0);
-    }
-
-    [Test]
-    public void TestWithExceptions()
-    {
-        int count0 = 0;
-
-        EasyDelegate evt = new EasyDelegate();
-        evt.AddListener(() => throw new InvalidOperationException());
-        evt.AddListener(() => count0++);
-        evt.AddListener(() => throw new InvalidOperationException());
-
-        Assert.Throws<InvalidOperationException>(() => evt.Invoke());
-        Assert.AreEqual(count0, 0);
-
-        Assert.Throws<AggregateException>(() => evt.InvokeAll());
-        Assert.AreEqual(count0, 1);
+            Assert.Throws<AggregateException>(() => evt.InvokeAll());
+            Assert.AreEqual(count0, 1);
+        }
     }
 }

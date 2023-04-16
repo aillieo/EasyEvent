@@ -65,11 +65,23 @@ namespace AillieoUtils
             return this.GetEvent(eventDef, true).ListenOnce(callback);
         }
 
+        /// <summary>
+        /// Add listener to this event and evaluate after event invoked, then remove the listener if result is true.
+        /// </summary>
+        /// <param name="eventDef">Name of the event.</param>
+        /// <param name="callback">Callback for this event.</param>
+        /// <returns>Handle for this listener.</returns>
         public EventHandle ListenUntil(string eventDef, Func<bool> callback)
         {
             return this.GetEvent(eventDef, true).ListenUntil(_ => callback());
         }
 
+        /// <summary>
+        /// Add listener to this event and evaluate after event invoked, then remove the listener if result is true.
+        /// </summary>
+        /// <param name="eventDef">Name of the event.</param>
+        /// <param name="callback">Callback for this event.</param>
+        /// <returns>Handle for this listener.</returns>
         public EventHandle ListenUntil(string eventDef, Func<object, bool> callback)
         {
             return this.GetEvent(eventDef, true).ListenUntil(callback);
