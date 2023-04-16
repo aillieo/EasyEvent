@@ -26,34 +26,40 @@ namespace AillieoUtils
         /// </summary>
         public bool Valid => this.associatedDelegate != null;
 
+        /// <inheritdoc/>
         public EventHandle AddListener(Action<T> callback)
         {
             this.EnsureValid();
             return this.associatedDelegate.AddListener(callback);
         }
 
-        public bool Remove(EventHandle handle)
+        /// <inheritdoc/>
+        public bool Remove(EventHandle eventHandle)
         {
             this.EnsureValid();
-            return this.associatedDelegate.Remove(handle);
+            return this.associatedDelegate.Remove(eventHandle);
         }
 
+        /// <inheritdoc/>
         public int RemoveListener(Action<T> callback)
         {
             this.EnsureValid();
             return this.associatedDelegate.RemoveListener(callback);
         }
 
+        /// <inheritdoc/>
         public bool Equals(EasyEvent<T> other)
         {
             return Equals(this.associatedDelegate, other.associatedDelegate);
         }
 
+        /// <inheritdoc/>
         public override bool Equals(object obj)
         {
             return obj is EasyEvent<T> other && this.Equals(other);
         }
 
+        /// <inheritdoc/>
         public override int GetHashCode()
         {
             return this.associatedDelegate != null ? this.associatedDelegate.GetHashCode() : 0;

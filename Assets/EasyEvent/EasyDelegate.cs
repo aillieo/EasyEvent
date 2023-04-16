@@ -28,11 +28,7 @@ namespace AillieoUtils
             return new EasyEvent(del);
         }
 
-        /// <summary>
-        /// Add listener to this event.
-        /// </summary>
-        /// <param name="callback">Callback for this event.</param>
-        /// <returns>Handle for this listener.</returns>
+        /// <inheritdoc/>
         public EventHandle AddListener(Action callback)
         {
             if (callback == null)
@@ -61,11 +57,7 @@ namespace AillieoUtils
             return newHandle;
         }
 
-        /// <summary>
-        /// Remove a listener by eventHandle.
-        /// </summary>
-        /// <param name="eventHandle">Handle for the listener.</param>
-        /// <returns>Remove succeed.</returns>
+        /// <inheritdoc/>
         public bool Remove(EventHandle eventHandle)
         {
             if (eventHandle == null)
@@ -73,8 +65,7 @@ namespace AillieoUtils
                 throw new ArgumentNullException(nameof(eventHandle));
             }
 
-            Handle handle = eventHandle as Handle;
-            if (handle == null)
+            if (!(eventHandle is Handle handle))
             {
                 throw new InvalidOperationException($"Type not match: {eventHandle.GetType()} expected {typeof(Handle)}");
             }
@@ -126,11 +117,7 @@ namespace AillieoUtils
             return true;
         }
 
-        /// <summary>
-        /// Remove a listener.
-        /// </summary>
-        /// <param name="callback">The listener.</param>
-        /// <returns>Count of removed listener instances.</returns>
+        /// <inheritdoc/>
         public int RemoveListener(Action callback)
         {
             if (callback == null)
@@ -186,17 +173,13 @@ namespace AillieoUtils
             this.ListenerCount = 0;
         }
 
-        /// <summary>
-        /// Invoke the event.
-        /// </summary>
+        /// <inheritdoc/>
         public void Invoke()
         {
             this.InternalInvoke(false);
         }
 
-        /// <summary>
-        /// Invoke the event, exceptions (if any) will be aggregated and throw once.
-        /// </summary>
+        /// <inheritdoc/>
         public void InvokeAll()
         {
             this.InternalInvoke(true);
