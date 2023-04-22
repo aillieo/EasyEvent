@@ -356,6 +356,16 @@ namespace AillieoUtils.EasyEventTests
             evt.Invoke();
 
             Assert.AreEqual(1, counter);
+
+            evt.ListenOnce(() =>
+            {
+                counter++;
+            });
+
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(2, counter);
         }
 
         [Test]
@@ -719,6 +729,49 @@ namespace AillieoUtils.EasyEventTests
 
             Assert.Throws<AggregateException>(() => evt.InvokeAll());
             Assert.AreEqual(count0, 1);
+        }
+
+        [Test]
+        public void TestListenUntil()
+        {
+            var counter = 0;
+
+            var evt = new EasyDelegate();
+
+            EventHandle handle = evt.ListenUntil(() =>
+            {
+                counter++;
+                return counter >= 2;
+            });
+
+            evt.Invoke();
+            evt.Invoke();
+            evt.Invoke();
+
+            Assert.AreEqual(2, counter);
+        }
+
+        [Test]
+        public void TestListenUntil1()
+        {
+            var counter = 0;
+            var number = 0;
+
+            var evt1 = new EasyDelegate<int>();
+
+            evt1.ListenUntil(e =>
+            {
+                counter++;
+                number = e;
+                return e == 2;
+            });
+
+            evt1.Invoke(1);
+            evt1.Invoke(2);
+            evt1.Invoke(3);
+
+            Assert.AreEqual(2, number);
+            Assert.AreEqual(2, counter);
         }
     }
 }
