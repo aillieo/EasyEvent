@@ -166,7 +166,7 @@ The invocation continues when an exception occurs, and the exceptions are aggreg
 Event evt = new Event();
 evt.AddListener(() => throw new Exception());
 evt.AddListener(() => Debug.Log("evt invoke"));
-evt.SafeInvoke();
+evt.InvokeAll();
 
 // output:
 // evt invoke
