@@ -1,16 +1,16 @@
 ## EasyEvent
 
-EasyEvent is a lightweight and performant event system for Unity, providing an alternative to the traditional C# event and UnityEvent systems. It is designed with performance in mind and provides a more user-friendly API for developers.
+EasyEvent is a lightweight and performant event system for Unity that provides an alternative to the traditional C# event and UnityEvent systems. It offers a more user-friendly API and is designed with performance in mind.
 
-## Features
+### Features
 
-### User-Friendly
+#### User-Friendly API
 
-EasyEvent provides a more user-friendly API for developers, making it easier to work with events in Unity. Developers can register a lambda to one EasyDelegate/EasyEvent to get an EventHandle, which can be used to remove the listener later. Unlike UnityEvent, when using an EasyEvent, the listener and invoker are separate, similar to the behavior of a C# event. For this reason, the EasyEvent and EasyDelegate are implemented separately. The built-in EventCenter can be used as an out-of-the-box messaging system when starting a new project.
+EasyEvent provides a more intuitive and user-friendly API compared to UnityEvent and C# events. With EasyEvent, you can register a lambda function to an EasyDelegate/EasyEvent and obtain an EventHandle, which can be used to remove the listener later. This separation of listener and invoker behavior is similar to that of a C# event, making it easier to work with events in Unity. Additionally, the built-in EventCenter can be used as a messaging system in new projects.
 
-### Performance
+#### Performance Optimization
 
-Compared to C# event and UnityEvent, EasyEvent is a lightweight solution that provides better performance in most cases. A simple test was conducted using three types of events. The test involved registering, executing, and unregistering 100 times for every event, and the results showed the following statistics data:
+EasyEvent is a lightweight solution that offers improved performance over C# events and UnityEvent in most cases. In a performance test that involved registering, executing, and unregistering events 100 times, the statistics showed lower memory allocation and faster execution times for EasyEvent compared to C# events and UnityEvent.
 
 | Action | Event type | Total GC Alloc | Total time (ms) |
 | --- | --- | --- | --- |
@@ -24,15 +24,15 @@ Compared to C# event and UnityEvent, EasyEvent is a lightweight solution that pr
 | Unregister | UnityEvent | 0 | 0.11 |
 | Unregister | EasyEvent    | 0 | 0.06 |
 
-### MIT License
+#### MIT License
 
-EasyEvent is licensed under the MIT License, which denotes that there are no restrictions for commercial projects.
+EasyEvent is licensed under the MIT License, which means there are no restrictions for using it in commercial projects.
 
-## Installation
+### Installation
 
 EasyEvent can be installed via the Unity Package Manager. Alternatively, you can clone the repository and import the package manually.
 
-###  Via the Unity Package Manager
+####  Via the Unity Package Manager
 
 <details><summary>Steps for installing via the Unity Package Manager</summary>
 
@@ -44,7 +44,7 @@ EasyEvent can be installed via the Unity Package Manager. Alternatively, you can
 
 - Click the "Add" button to add the package to your project.</details>
 
-### Manual Installation
+#### Manual Installation
 
 <details><summary>Steps for manual Installation</summary>
 
@@ -56,38 +56,34 @@ EasyEvent can be installed via the Unity Package Manager. Alternatively, you can
 
 - Unity will import the package automatically.</details>
 
-## Quick Start
+### Quick Start
 
-### Use an EasyDelegate
+#### Using an EasyDelegate
 
-AddListener/Remove/RemoveListener
-
-When a callback function is added as a listener, the EasyEvent instance returns a `Handle`, which is intended to facilitate the removal of anonymous methods and lambda expressions. 
+You can add listeners to an EasyDelegate and remove them using the returned handle.
 
 ```C#
-// add listener
 EasyDelegate someDel = new EasyDelegate();
-someDel.AddListener(() => Debug.Log("someDel invoke"));
+someDel.AddListener(() => Debug.Log("someDel invoked"));
 
-// invoke
 someDel.Invoke();
-// output:
-// someDel invoke
+// Output:
+// someDel invoked
 ```
 
-To remove a listener, simply call `Remove` and pass the handle. You can also use `RemoveListener`, but it is not efficient.
+To remove a listener, call `Remove` and pass the handle.
 
 ```C#
 EasyDelegate someDel = new EasyDelegate();
 var handle = someDel.AddListener(SomeMethod);
 
-// to remove you can:
+// To remove the listener:
 someDel.Remove(handle);
 // or:
 // someDel.RemoveListener(SomeMethod);
 ```
 
-### Declare an event
+#### Declaring an Event
 
 When using EasyEvent, declare it as a property and define an EasyDelegate as the backing field.
 
@@ -100,19 +96,19 @@ public class Foo
 }
 ```
 
-Register in other classes:
+Register listeners in other classes.
 
 ```C#
 public class Bar
 {
     private void Initialize()
     {
-        var handle = instanceOfFoo.OnBattleEnd.AddListener(res => Debug.Log("battle end"));
+        var handle = instanceOfFoo.OnBattleEnd.AddListener(res => Debug.Log("Battle ended"));
     }
 }
 ```
 
-Invoke in the declaring class:
+Invoke the event in the declaring class.
 
 ```C#
 public class Foo
@@ -125,20 +121,20 @@ public class Foo
 }
 ```
 
-### ListenOnce/ListenUntil
+#### ListenOnce/ListenUntil
 
-In some cases, you only need to listen to an event once and then remove it, and `ListenOnce` is ready for you.
+If you only need to listen to an event once and then remove the listener, you can use `ListenOnce`.
 
 ```C#
 EasyEvent evt = ...;
-evt.AddListener(() => Debug.Log("only once"));
+evt.AddListener(() => Debug.Log("Only once"));
 
 evt.Invoke();
-// output:
-// only once
+// Output:
+// Only once
 
 evt.Invoke();
-// no output
+// No output
 ```
 
 Similarly, use `ListenUntil` when you need to keep listening for events until a certain condition is met.
@@ -158,25 +154,25 @@ evt.ListenUntil(arg =>
 });
 ```
 
-### InvokeAll
+#### InvokeAll
 
-The invocation continues when an exception occurs, and the exceptions are aggregated and thrown when the event call ends.
+Event invocation continues even if an exception occurs. Exceptions are aggregated and thrown when the event call ends.
 
 ```C#
 Event evt = new Event();
 evt.AddListener(() => throw new Exception());
-evt.AddListener(() => Debug.Log("evt invoke"));
+evt.AddListener(() => Debug.Log("Event invoked"));
 evt.InvokeAll();
 
-// output:
-// evt invoke
+// Output:
+// Event invoked
 // Exception: Exception of type 'System.Exception' was thrown.
 ```
 
-## API Reference
+### API Reference
 
 For detailed usage and documentation, please refer to the API reference.
 
-## Limitations
+### Limitations
 
 EasyEvent is not thread-safe, so extra care is required when using it with multiple threads.
